@@ -144,6 +144,46 @@ textarea{resize:vertical;min-height:120px;line-height:1.6}
 #loader{position:fixed;inset:0;background:rgba(245,242,236,0.92);display:none;align-items:center;justify-content:center;z-index:300;gap:16px;flex-direction:column}
 .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
 #loader p{font-family:'Instrument Sans',sans-serif;font-weight:500;font-size:15px;color:var(--ink)}
+
+/* ── SIDEBAR ELEGANTE ── */
+.sidebar{background:linear-gradient(180deg,#1a1814 0%,#212118 100%);border-right:1px solid rgba(255,255,255,0.06)}
+.sidebar-logo{border-bottom:1px solid rgba(255,255,255,0.06);padding:24px 20px}
+.sidebar-btn{border-radius:10px;font-size:13.5px;padding:11px 16px}
+.sidebar-btn.active{background:rgba(82,183,136,0.15);color:#52b788;border:1px solid rgba(82,183,136,0.2)}
+.sidebar-user{background:rgba(255,255,255,0.03);border-top:1px solid rgba(255,255,255,0.06);padding:16px 20px}
+.dash-stat{border-radius:14px;transition:box-shadow .2s}
+.dash-stat:hover{box-shadow:0 4px 20px rgba(45,106,79,0.1)}
+.dash-cta{border-radius:18px;background:linear-gradient(135deg,#1a1814 0%,#2d3a2e 100%)}
+.history-item{border-radius:14px}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  .app{flex-direction:column}
+  .sidebar{width:100%;height:auto;flex-direction:row;align-items:center;flex-shrink:0;overflow-x:auto}
+  .sidebar-logo{padding:12px 16px;border-bottom:none;border-right:1px solid rgba(255,255,255,0.08);flex-shrink:0}
+  .sidebar-section{display:none}
+  .sidebar-btn{flex-direction:column;gap:4px;padding:10px 12px;font-size:11px;margin:4px;width:auto;white-space:nowrap;border-radius:8px;min-width:60px;align-items:center}
+  .sidebar-btn svg{width:20px;height:20px}
+  .sidebar-spacer{display:none}
+  .sidebar-user{margin-left:auto;padding:8px 12px;border-top:none;border-left:1px solid rgba(255,255,255,0.08);flex-shrink:0}
+  .user-info{display:none}
+  .main{overflow:auto}
+  .view.active{padding:20px}
+  .dash-stats{grid-template-columns:1fr 1fr;gap:10px}
+  .dash-cta{flex-direction:column;gap:16px;padding:22px}
+  .history-item{padding:14px 16px;gap:12px}
+  .setup-wrap{max-width:100%}
+  .row-2{grid-template-columns:1fr}
+  .interview-header{padding:12px 16px}
+  .chat-area{padding:16px}
+  .input-footer{padding:12px 16px}
+  .progress-bar{width:80px}
+  #viewResults{padding:20px}
+  .score-card{flex-direction:column;text-align:center;padding:20px}
+  .results-actions{flex-direction:column}
+  .btn-nueva-desde-resultados,.btn-download{width:100%;justify-content:center}
+}
+
 </style>
 </head>
 <body>
@@ -326,9 +366,9 @@ let S={puesto:'',sector:'',nivel:'',oferta:'',nombre:'',history:[],qCount:0,load
 window.addEventListener('load',async()=>{
   loader('Verificando acceso...');
   const{data:{session}}=await supa.auth.getSession();
-  if(!session){window.location.href='index.html';return;}
+  if(!session){window.location.href='https://entriajobs.com';return;}
   const{data:profile}=await supa.from('profiles').select('is_pro').eq('id',session.user.id).single();
-  if(!profile?.is_pro){window.location.href='index.html';return;}
+  if(!profile?.is_pro){window.location.href='https://entriajobs.com';return;}
   currentUser=session.user;
   const email=currentUser.email||'';
   document.getElementById('userEmailDisplay').textContent=email;
@@ -340,7 +380,7 @@ window.addEventListener('load',async()=>{
 async function logout(){
   if(!confirm('¿Cerrar sesión?'))return;
   await supa.auth.signOut();
-  window.location.href='index.html';
+  window.location.href='https://entriajobs.com';
 }
 
 // VIEWS
@@ -406,9 +446,17 @@ function renderHistory(){
 function viewHistoryItem(id){
   const item=historyData.find(e=>e.id===id);
   if(!item)return;
-  S.evalData={puntuacion:item.puntuacion,nivel:item.nivel_evaluacion,resumen:item.resumen,
-    puntosFuertes:item.puntos_fuertes||[],mejorar:item.areas_mejora||[],consejo:item.consejo||''};
-  S.puesto=item.puesto;S.nombre=item.candidato||'Tú';
+  const pf=item.puntos_fuertes||item.puntosFuertes||[];
+  const am=item.areas_mejora||item.mejorar||[];
+  S.evalData={
+    puntuacion:item.puntuacion||0,
+    nivel:item.nivel_evaluacion||item.nivel||'',
+    resumen:item.resumen||'',
+    puntosFuertes:Array.isArray(pf)?pf:[],
+    mejorar:Array.isArray(am)?am:[],
+    consejo:item.consejo||''
+  };
+  S.puesto=item.puesto||'';S.nombre=item.candidato||'Tu';
   showView('results');
   renderResults(S.evalData);
 }
