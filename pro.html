@@ -373,7 +373,7 @@ function renderStats(){
   document.getElementById('statMejor').textContent=mejor||'—';
   // Greeting by time
   const h=new Date().getHours();
-  const greet=h<12?'Buenos días':'h<18?'Buenas tardes':'Buenas noches';
+  const greet=h<12?'Buenos días':h<18?'Buenas tardes':'Buenas noches';
   document.querySelector('.dash-header h1').textContent=greet+' 👋';
 }
 
