@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EntrIA Pro — Tu simulador de entrevistas</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f2ec;--bg2:#ede9e0;--ink:#1a1814;--ink2:#5a5650;--accent:#2d6a4f;--accent2:#52b788;--accent-light:#d8f3dc;--border:rgba(26,24,20,0.12);--gold:#c9a96e}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:'Instrument Sans',sans-serif}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* APP SHELL */
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:260px;background:var(--ink);color:white;display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:22px 20px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.sidebar-logo-text{font-family:'Instrument Sans',sans-serif;font-size:18px;font-weight:600}
+.sidebar-logo-text span{color:var(--accent2)}
+.pro-chip{font-size:10px;background:linear-gradient(135deg,var(--gold),#e8c88a);color:#1a1814;padding:2px 8px;border-radius:10px;font-weight:700;margin-left:4px}
+.sidebar-section{padding:20px 16px 8px;font-size:11px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:1px;text-transform:uppercase}
+.sidebar-btn{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:8px;cursor:pointer;font-size:14px;color:rgba(255,255,255,0.75);transition:all .15s;margin:2px 8px;border:none;background:none;font-family:'Instrument Sans',sans-serif;width:calc(100% - 16px);text-align:left}
+.sidebar-btn:hover{background:rgba(255,255,255,0.08);color:white}
+.sidebar-btn.active{background:rgba(82,183,136,0.2);color:var(--accent2)}
+.sidebar-btn svg{flex-shrink:0;opacity:.7}
+.sidebar-btn.active svg{opacity:1}
+.sidebar-spacer{flex:1}
+.sidebar-user{padding:16px;border-top:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#e8c88a);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#1a1814;flex-shrink:0}
+.user-info{flex:1;min-width:0}
+.user-email{font-size:12px;color:rgba(255,255,255,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-plan{font-size:11px;color:var(--accent2);font-weight:600}
+.btn-logout{background:none;border:none;color:rgba(255,255,255,0.35);cursor:pointer;padding:4px;transition:color .15s;font-size:16px}
+.btn-logout:hover{color:white}
+
+/* MAIN */
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column}
+
+/* VIEWS */
+.view{display:none;flex:1;overflow-y:auto;padding:40px}
+.view.active{display:flex;flex-direction:column}
+
+/* DASHBOARD */
+.dash-header{margin-bottom:36px}
+.dash-header h1{font-family:'DM Serif Display',serif;font-size:32px;font-weight:400;margin-bottom:6px}
+.dash-header p{color:var(--ink2);font-size:15px}
+.dash-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:36px}
+.dash-stat{background:white;border:1px solid var(--border);border-radius:12px;padding:22px}
+.dash-stat-num{font-family:'DM Serif Display',serif;font-size:32px;color:var(--accent);line-height:1;margin-bottom:4px}
+.dash-stat-label{font-size:13px;color:var(--ink2)}
+.dash-cta{background:var(--ink);border-radius:16px;padding:32px;color:white;display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:32px}
+.dash-cta h2{font-family:'DM Serif Display',serif;font-size:22px;font-weight:400;margin-bottom:6px}
+.dash-cta p{font-size:14px;opacity:.7}
+.btn-nueva{background:var(--accent2);color:var(--ink);border:none;padding:13px 24px;border-radius:8px;font-family:'Instrument Sans',sans-serif;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;transition:all .15s}
+.btn-nueva:hover{background:#40a875;transform:translateY(-1px)}
+.history-title{font-family:'DM Serif Display',serif;font-size:20px;font-weight:400;margin-bottom:16px}
+.history-empty{text-align:center;padding:48px;color:var(--ink2);font-size:14px;background:white;border:1px solid var(--border);border-radius:12px}
+.history-item{background:white;border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:12px;display:flex;align-items:center;gap:20px;cursor:pointer;transition:border-color .15s,box-shadow .15s;animation:fadeUp .3s ease}
+.history-item:hover{border-color:var(--accent);box-shadow:0 2px 12px rgba(45,106,79,0.1)}
+.history-score{width:52px;height:52px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
+.history-score-num{font-family:'DM Serif Display',serif;font-size:18px;font-weight:400;line-height:1}
+.history-score-sub{font-size:9px;font-weight:500}
+.history-info{flex:1}
+.history-puesto{font-size:15px;font-weight:500;margin-bottom:3px}
+.history-meta{font-size:13px;color:var(--ink2)}
+.history-nivel{font-size:12px;font-weight:600;padding:2px 10px;border-radius:20px}
+
+/* SETUP VIEW */
+.setup-wrap{max-width:640px}
+.setup-wrap h1{font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;margin-bottom:8px}
+.setup-wrap .sub{color:var(--ink2);margin-bottom:32px;font-size:15px}
+.form-group{margin-bottom:18px}
+label{display:block;font-size:13px;font-weight:500;color:var(--ink);margin-bottom:5px}
+input[type="text"],select,textarea{width:100%;background:white;border:1px solid var(--border);border-radius:8px;padding:11px 15px;font-family:'Instrument Sans',sans-serif;font-size:15px;color:var(--ink);outline:none;transition:border-color .15s}
+input[type="text"]:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,106,79,0.08)}
+textarea{resize:vertical;min-height:120px;line-height:1.6}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.btn-start{background:var(--ink);color:white;border:none;padding:15px 32px;border-radius:8px;font-family:'Instrument Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px;transition:background .15s,transform .15s}
+.btn-start:hover{background:var(--accent);transform:translateY(-1px)}
+
+/* INTERVIEW VIEW */
+#viewInterview{padding:0;overflow:hidden}
+.interview-header{display:flex;align-items:center;justify-content:space-between;padding:14px 32px;border-bottom:1px solid var(--border);background:white;flex-shrink:0}
+.interview-logo{display:flex;align-items:center;gap:8px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:16px}
+.interview-logo span{color:var(--accent)}
+.pro-indicator{font-size:11px;background:linear-gradient(135deg,#fdf8f0,#f5ede0);color:var(--gold);border:1px solid rgba(201,169,110,0.3);padding:3px 10px;border-radius:20px;font-weight:600}
+.progress-area{display:flex;align-items:center;gap:12px}
+.q-counter{font-size:13px;color:var(--ink2)}
+.progress-bar{width:120px;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease}
+.chat-area{flex:1;overflow-y:auto;padding:28px 32px;display:flex;flex-direction:column;gap:16px}
+.msg{display:flex;gap:11px;max-width:78%;animation:fadeUp .3s ease}
+.msg.ai{align-self:flex-start}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.msg-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+.ai .msg-avatar{background:var(--ink);color:white}
+.user .msg-avatar{background:var(--accent-light);color:var(--accent)}
+.msg-bubble{padding:12px 16px;border-radius:16px;font-size:15px;line-height:1.65}
+.ai .msg-bubble{background:white;border:1px solid var(--border);border-top-left-radius:4px}
+.user .msg-bubble{background:var(--ink);color:white;border-top-right-radius:4px}
+.typing-indicator{display:flex;gap:5px;padding:14px 16px;background:white;border:1px solid var(--border);border-radius:16px;border-top-left-radius:4px;width:fit-content}
+.typing-indicator span{width:7px;height:7px;background:var(--ink2);border-radius:50%;animation:bounce 1.2s infinite ease-in-out}
+.typing-indicator span:nth-child(2){animation-delay:.2s}
+.typing-indicator span:nth-child(3){animation-delay:.4s}
+.input-footer{padding:16px 32px;border-top:1px solid var(--border);background:white;display:flex;gap:10px;align-items:flex-end;flex-shrink:0}
+.input-footer textarea{flex:1;min-height:48px;max-height:120px;padding:12px 16px;border-radius:10px;font-size:15px;resize:none;background:white;border:1px solid var(--border);font-family:'Instrument Sans',sans-serif;color:var(--ink);outline:none}
+.input-footer textarea:focus{border-color:var(--accent)}
+.send-btn{height:48px;padding:0 20px;background:var(--ink);color:white;border:none;border-radius:10px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:background .15s;flex-shrink:0}
+.send-btn:hover{background:var(--accent)}
+.send-btn:disabled{opacity:.4;cursor:not-allowed}
+.review-banner{margin:12px 32px;padding:14px 20px;background:linear-gradient(135deg,var(--accent-light),#b7e4c7);border:1px solid rgba(45,106,79,0.2);border-radius:10px;display:none;align-items:center;justify-content:space-between;gap:14px;flex-shrink:0;animation:fadeUp .4s ease}
+.review-banner p{font-size:14px;color:var(--accent);font-weight:500}
+.btn-ver-informe{background:var(--accent);color:white;border:none;padding:10px 20px;border-radius:8px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap}
+
+/* RESULTS VIEW */
+#viewResults{max-width:720px}
+.score-card{background:white;border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px;display:flex;align-items:center;gap:24px}
+.score-circle{width:88px;height:88px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
+.score-num{font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;line-height:1}
+.score-label{font-size:10px;font-weight:500;margin-top:2px}
+.score-details h3{font-family:'DM Serif Display',serif;font-size:19px;font-weight:400;margin-bottom:5px}
+.score-details p{color:var(--ink2);font-size:14px;line-height:1.6}
+.feedback-section{background:white;border:1px solid var(--border);border-radius:12px;padding:22px 26px;margin-bottom:12px}
+.feedback-section h3{font-size:14px;font-weight:600;margin-bottom:10px}
+.feedback-section li,.feedback-section p{font-size:14px;color:var(--ink2);line-height:1.7;margin-bottom:4px}
+.feedback-section ul{padding-left:16px}
+.tag-pos{color:#2d6a4f;background:#d8f3dc;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500}
+.tag-imp{color:#b5451b;background:#fde8d8;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500}
+.results-actions{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
+.btn-nueva-desde-resultados{background:var(--ink);color:white;border:none;padding:12px 24px;border-radius:8px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:background .15s}
+.btn-nueva-desde-resultados:hover{background:var(--accent)}
+.btn-download{background:var(--accent);color:white;border:none;padding:12px 20px;border-radius:8px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .15s}
+.btn-download:hover{background:#1f4f38}
+.btn-download:disabled{opacity:.6;cursor:not-allowed}
+.back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--ink2);font-size:14px;cursor:pointer;margin-bottom:24px;background:none;border:none;font-family:'Instrument Sans',sans-serif;transition:color .15s}
+.back-btn:hover{color:var(--ink)}
+
+#loader{position:fixed;inset:0;background:rgba(245,242,236,0.92);display:none;align-items:center;justify-content:center;z-index:300;gap:16px;flex-direction:column}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+#loader p{font-family:'Instrument Sans',sans-serif;font-weight:500;font-size:15px;color:var(--ink)}
+</style>
+</head>
+<body>
+
+<div id="loader"><div class="spinner"></div><p id="loaderText">Cargando...</p></div>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="#52b788"/>
+        <polyline points="5,17 10,22 18,11" stroke="rgba(255,255,255,0.4)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <polyline points="10,17 15,22 26,11" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <div class="sidebar-logo-text">Entr<span>IA</span> <span class="pro-chip">PRO</span></div>
+    </div>
+
+    <div class="sidebar-section">Menú</div>
+    <button class="sidebar-btn active" id="btnDash" onclick="showView('dashboard')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+      Inicio
+    </button>
+    <button class="sidebar-btn" id="btnNew" onclick="showView('setup')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      Nueva entrevista
+    </button>
+    <button class="sidebar-btn" id="btnHistory" onclick="showView('dashboard')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+      Mi historial
+    </button>
+
+    <div class="sidebar-spacer"></div>
+
+    <div class="sidebar-user">
+      <div class="user-avatar" id="userAvatar">?</div>
+      <div class="user-info">
+        <div class="user-email" id="userEmailDisplay">Cargando...</div>
+        <div class="user-plan">✓ Pro</div>
+      </div>
+      <button class="btn-logout" title="Cerrar sesión" onclick="logout()">↩</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- DASHBOARD -->
+    <div class="view active" id="viewDashboard">
+      <div class="dash-header">
+        <h1>Buenos días 👋</h1>
+        <p>Aquí tienes tu resumen de progreso y tus últimas entrevistas.</p>
+      </div>
+      <div class="dash-stats">
+        <div class="dash-stat">
+          <div class="dash-stat-num" id="statEntrevistas">0</div>
+          <div class="dash-stat-label">Entrevistas realizadas</div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat-num" id="statMedia">—</div>
+          <div class="dash-stat-label">Puntuación media</div>
+        </div>
+        <div class="dash-stat">
+          <div class="dash-stat-num" id="statMejor">—</div>
+          <div class="dash-stat-label">Mejor puntuación</div>
+        </div>
+      </div>
+      <div class="dash-cta">
+        <div>
+          <h2>¿Listo para practicar?</h2>
+          <p>Cada entrevista te acerca más a ese trabajo que buscas.</p>
+        </div>
+        <button class="btn-nueva" onclick="showView('setup')">Nueva entrevista →</button>
+      </div>
+      <div class="history-title">Últimas entrevistas</div>
+      <div id="historyList"><div class="history-empty">Aún no has realizado ninguna entrevista.<br>¡Empieza ahora y ve tu progreso aquí!</div></div>
+    </div>
+
+    <!-- SETUP -->
+    <div class="view" id="viewSetup">
+      <div class="setup-wrap">
+        <h1>Nueva entrevista</h1>
+        <p class="sub">Configura los detalles y EntrIA preparará las preguntas perfectas para ti.</p>
+        <div class="form-group">
+          <label>Puesto al que aspiras *</label>
+          <input type="text" id="puesto" placeholder="Ej: Comercial B2B, Desarrollador Frontend, Contable...">
+        </div>
+        <div class="row-2">
+          <div class="form-group">
+            <label>Sector</label>
+            <select id="sector">
+              <option value="general">General</option>
+              <option value="tecnologia">Tecnología</option>
+              <option value="ventas">Ventas / Comercial</option>
+              <option value="marketing">Marketing</option>
+              <option value="finanzas">Finanzas / Contabilidad</option>
+              <option value="rrhh">Recursos Humanos</option>
+              <option value="salud">Salud / Sanidad</option>
+              <option value="educacion">Educación</option>
+              <option value="logistica">Logística / Operaciones</option>
+              <option value="hosteleria">Hostelería / Turismo</option>
+              <option value="ingenieria">Ingeniería</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Nivel de experiencia</label>
+            <select id="nivel">
+              <option value="junior">Junior (0-2 años)</option>
+              <option value="medio">Medio (2-5 años)</option>
+              <option value="senior">Senior (5+ años)</option>
+              <option value="directivo">Directivo / Management</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Descripción de la oferta (recomendado)</label>
+          <textarea id="oferta" placeholder="Pega aquí el texto de la oferta de InfoJobs, LinkedIn, etc."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Tu nombre</label>
+          <input type="text" id="nombre" placeholder="Ej: Carlos">
+        </div>
+        <button class="btn-start" onclick="startInterview()">Comenzar entrevista →</button>
+      </div>
+    </div>
+
+    <!-- INTERVIEW -->
+    <div class="view" id="viewInterview" style="padding:0;overflow:hidden">
+      <div class="interview-header">
+        <div class="interview-logo">
+          <svg width="24" height="24" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="8" fill="#52b788"/>
+            <polyline points="5,17 10,22 18,11" stroke="rgba(255,255,255,0.4)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <polyline points="10,17 15,22 26,11" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          Entr<span>IA</span>
+          <span class="pro-indicator">PRO ✓</span>
+        </div>
+        <div class="progress-area">
+          <span class="q-counter" id="qCounter">Pregunta 1</span>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:10%"></div></div>
+        </div>
+      </div>
+      <div class="chat-area" id="chatArea"></div>
+      <div class="review-banner" id="reviewBanner">
+        <p><strong>Entrevista completada.</strong> Revisa la conversación y pulsa para ver tu informe.</p>
+        <button class="btn-ver-informe" onclick="generateResults()">Ver mi informe →</button>
+      </div>
+      <div class="input-footer" id="inputFooter">
+        <textarea id="userInput" placeholder="Escribe tu respuesta aquí..." rows="1"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendAnswer()">Enviar</button>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="view" id="viewResults">
+      <button class="back-btn" onclick="showView('dashboard')">← Volver al inicio</button>
+      <h2 style="font-family:'DM Serif Display',serif;font-size:30px;font-weight:400;margin-bottom:6px" id="resultsTitle">Tu informe</h2>
+      <p style="color:var(--ink2);font-size:14px;margin-bottom:28px" id="resultsSubtitle"></p>
+      <div id="resultsContent"></div>
+      <div class="results-actions">
+        <button class="btn-nueva-desde-resultados" onclick="showView('setup')">Nueva entrevista</button>
+        <button class="btn-download" id="downloadBtn" onclick="downloadPDF()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          Descargar PDF
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPA_URL='https://amfpvzbujxkvarqaojnj.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtZnB2emJ1anhrdmFycWFvam5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNjA2ODQsImV4cCI6MjA5MzczNjY4NH0.7B7ggFkRkw6xyybHcNHTBdxi8uSw0votgS6_7jEfqMs';
+const supa=supabase.createClient(SUPA_URL,SUPA_KEY);
+
+let currentUser=null;
+let S={puesto:'',sector:'',nivel:'',oferta:'',nombre:'',history:[],qCount:0,loading:false,done:false,evalData:null};
+
+// INIT — check auth
+window.addEventListener('load',async()=>{
+  loader('Verificando acceso...');
+  const{data:{session}}=await supa.auth.getSession();
+  if(!session){window.location.href='index.html';return;}
+  const{data:profile}=await supa.from('profiles').select('is_pro').eq('id',session.user.id).single();
+  if(!profile?.is_pro){window.location.href='index.html';return;}
+  currentUser=session.user;
+  const email=currentUser.email||'';
+  document.getElementById('userEmailDisplay').textContent=email;
+  document.getElementById('userAvatar').textContent=email.charAt(0).toUpperCase();
+  hideLoader();
+  loadHistory();
+});
+
+async function logout(){
+  if(!confirm('¿Cerrar sesión?'))return;
+  await supa.auth.signOut();
+  window.location.href='index.html';
+}
+
+// VIEWS
+function showView(v){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.sidebar-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view'+v.charAt(0).toUpperCase()+v.slice(1)).classList.add('active');
+  if(v==='dashboard'){document.getElementById('btnDash').classList.add('active');loadHistory();}
+  else if(v==='setup'){document.getElementById('btnNew').classList.add('active');resetState();}
+}
+
+// HISTORY
+let historyData=[];
+
+async function loadHistory(){
+  const{data}=await supa.from('entrevistas').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  historyData=data||[];
+  renderStats();
+  renderHistory();
+}
+
+function renderStats(){
+  const total=historyData.length;
+  document.getElementById('statEntrevistas').textContent=total;
+  if(total===0){document.getElementById('statMedia').textContent='—';document.getElementById('statMejor').textContent='—';return;}
+  const scores=historyData.map(e=>e.puntuacion).filter(Boolean);
+  const media=Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
+  const mejor=Math.max(...scores);
+  document.getElementById('statMedia').textContent=media||'—';
+  document.getElementById('statMejor').textContent=mejor||'—';
+  // Greeting by time
+  const h=new Date().getHours();
+  const greet=h<12?'Buenos días':'h<18?'Buenas tardes':'Buenas noches';
+  document.querySelector('.dash-header h1').textContent=greet+' 👋';
+}
+
+function renderHistory(){
+  const list=document.getElementById('historyList');
+  if(historyData.length===0){
+    list.innerHTML='<div class="history-empty">Aún no has realizado ninguna entrevista.<br>¡Empieza ahora y ve tu progreso aquí!</div>';
+    return;
+  }
+  list.innerHTML=historyData.slice(0,10).map(e=>{
+    const col=e.puntuacion>=75?'#2d6a4f':e.puntuacion>=55?'#b7621b':'#c0392b';
+    const bg=e.puntuacion>=75?'#d8f3dc':e.puntuacion>=55?'#fef3e2':'#fde8d8';
+    const date=new Date(e.created_at).toLocaleDateString('es-ES');
+    const nivelCol=e.puntuacion>=75?'#d8f3dc':e.puntuacion>=55?'#fef3e2':'#fde8d8';
+    const nivelTxt=e.puntuacion>=75?'#2d6a4f':e.puntuacion>=55?'#b7621b':'#c0392b';
+    return `<div class="history-item" onclick="viewHistoryItem(${e.id})">
+      <div class="history-score" style="background:${bg}">
+        <div class="history-score-num" style="color:${col}">${e.puntuacion||'?'}</div>
+        <div class="history-score-sub" style="color:${col}">/100</div>
+      </div>
+      <div class="history-info">
+        <div class="history-puesto">${e.puesto||'Entrevista'}</div>
+        <div class="history-meta">${date} · ${e.sector||''} · ${e.nivel||''}</div>
+      </div>
+      <span class="history-nivel" style="background:${nivelCol};color:${nivelTxt}">${e.nivel_evaluacion||''}</span>
+    </div>`;
+  }).join('');
+}
+
+function viewHistoryItem(id){
+  const item=historyData.find(e=>e.id===id);
+  if(!item)return;
+  S.evalData={puntuacion:item.puntuacion,nivel:item.nivel_evaluacion,resumen:item.resumen,
+    puntosFuertes:item.puntos_fuertes||[],mejorar:item.areas_mejora||[],consejo:item.consejo||''};
+  S.puesto=item.puesto;S.nombre=item.candidato||'Tú';
+  showView('results');
+  renderResults(S.evalData);
+}
+
+// INTERVIEW
+function resetState(){S={puesto:'',sector:'',nivel:'',oferta:'',nombre:'',history:[],qCount:0,loading:false,done:false,evalData:null};}
+
+async function startInterview(){
+  const puesto=document.getElementById('puesto').value.trim();
+  if(!puesto){alert('Por favor indica el puesto al que aspiras.');return;}
+  S.puesto=puesto;S.sector=document.getElementById('sector').value;
+  S.nivel=document.getElementById('nivel').value;
+  S.oferta=document.getElementById('oferta').value.trim();
+  S.nombre=document.getElementById('nombre').value.trim()||currentUser.email.split('@')[0]||'Candidato';
+  loader('Preparando tu entrevista personalizada...');
+  S.history=[{role:'user',content:`Hola, estoy aquí para la entrevista del puesto de ${S.puesto}. Me llamo ${S.nombre}.`}];
+  try{
+    const reply=await api(buildSystem(),S.history);
+    S.history.push({role:'assistant',content:reply});S.qCount=1;
+    hideLoader();showView('interview');
+    document.getElementById('chatArea').innerHTML='';
+    document.getElementById('reviewBanner').style.display='none';
+    document.getElementById('inputFooter').style.display='flex';
+    document.getElementById('progressFill').style.width='10%';
+    document.getElementById('qCounter').textContent='Pregunta 1';
+    addMsg('ai',reply,false);setupKeys();
+  }catch(e){hideLoader();alert('Error de conexión. Inténtalo de nuevo.');}
+}
+
+function buildSystem(){
+  return `Eres un entrevistador de RRHH profesional español, directo y cercano.
+Esta es una sesión Pro sin límite de preguntas para el candidato ${S.nombre}, puesto "${S.puesto}" (sector: ${S.sector}, nivel: ${S.nivel}).
+REGLAS:
+- Haz entre 8 y 12 preguntas, variando según la profundidad de las respuestas. UNA por mensaje.
+- Mezcla: motivación, experiencia, competencias conductuales STAR, situacionales y técnicas del sector.
+- Tras cada respuesta, comentario breve y natural (1 frase) antes de la siguiente pregunta.
+- Cuando consideres que has cubierto bien todas las áreas, cierra la entrevista y escribe ENTREVISTA_COMPLETADA al final.
+- No rompas el personaje.
+${S.oferta?'\nOFERTA:\n'+S.oferta.substring(0,1500):''}`;
+}
+
+function addMsg(role,text,checkDone=true){
+  const chat=document.getElementById('chatArea');
+  const isDone=text.includes('ENTREVISTA_COMPLETADA');
+  const clean=text.replace('ENTREVISTA_COMPLETADA','').trim();
+  const div=document.createElement('div');div.className='msg '+role;
+  const av=role==='ai'?'E':S.nombre.charAt(0).toUpperCase();
+  div.innerHTML=`<div class="msg-avatar">${av}</div><div class="msg-bubble">${clean.replace(/\n/g,'<br>')}</div>`;
+  chat.appendChild(div);chat.scrollTop=chat.scrollHeight;
+  if(checkDone&&isDone){
+    S.done=true;
+    document.getElementById('inputFooter').style.display='none';
+    document.getElementById('reviewBanner').style.display='flex';
+    document.getElementById('progressFill').style.width='100%';
+    setTimeout(()=>{chat.scrollTop=chat.scrollHeight;},100);
+  }
+}
+
+function showTyping(){
+  const chat=document.getElementById('chatArea');
+  const div=document.createElement('div');div.className='msg ai';div.id='typing';
+  div.innerHTML='<div class="msg-avatar">E</div><div class="typing-indicator"><span></span><span></span><span></span></div>';
+  chat.appendChild(div);chat.scrollTop=chat.scrollHeight;
+}
+function hideTyping(){const t=document.getElementById('typing');if(t)t.remove();}
+
+function setupKeys(){
+  const inp=document.getElementById('userInput');
+  inp.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAnswer();}};
+  inp.oninput=function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px';};
+  inp.focus();
+}
+
+async function sendAnswer(){
+  const inp=document.getElementById('userInput');
+  const text=inp.value.trim();
+  if(!text||S.loading||S.done)return;
+  S.loading=true;document.getElementById('sendBtn').disabled=true;
+  inp.value='';inp.style.height='auto';
+  addMsg('user',text,false);S.history.push({role:'user',content:text});showTyping();
+  try{
+    const reply=await api(buildSystem(),S.history);
+    hideTyping();S.history.push({role:'assistant',content:reply});
+    S.qCount++;
+    // Progress animation: cap at 90% until done
+    const pct=Math.min(90,S.qCount*9);
+    document.getElementById('progressFill').style.width=pct+'%';
+    document.getElementById('qCounter').textContent=`Pregunta ${S.qCount}`;
+    addMsg('ai',reply,true);
+  }catch(e){hideTyping();addMsg('ai','Hubo un problema técnico. Repite tu respuesta.',false);}
+  S.loading=false;document.getElementById('sendBtn').disabled=false;
+  if(!S.done)inp.focus();
+}
+
+async function generateResults(){
+  loader('Analizando tu desempeño...');
+  const conv=S.history.filter(m=>m.role!=='system')
+    .map(m=>`${m.role==='user'?S.nombre:'Entrevistador'}: ${m.content.replace('ENTREVISTA_COMPLETADA','')}`)
+    .join('\n\n');
+  const prompt=`Analiza esta entrevista para "${S.puesto}" y responde SOLO con JSON sin backticks:
+{"puntuacion":75,"nivel":"Bueno","resumen":"párrafo corto","puntosFuertes":["p1","p2","p3"],"mejorar":["m1","m2","m3"],"consejo":"consejo accionable"}
+Niveles: Necesita mejorar / Aceptable / Bueno / Muy bueno / Excelente
+ENTREVISTA:\n${conv.substring(0,4000)}`;
+  try{
+    const r=await api('Eres evaluador experto en RRHH. Responde SOLO con JSON válido.',
+      [{role:'user',content:prompt}]);
+    try{S.evalData=JSON.parse(r.replace(/```json|```/g,'').trim());}
+    catch(e){S.evalData=fallbackData();}
+  }catch(e){S.evalData=fallbackData();}
+
+  // Save to Supabase
+  await supa.from('entrevistas').insert({
+    user_id:currentUser.id,
+    puesto:S.puesto,sector:S.sector,nivel:S.nivel,
+    candidato:S.nombre,
+    puntuacion:S.evalData.puntuacion,
+    nivel_evaluacion:S.evalData.nivel,
+    resumen:S.evalData.resumen,
+    puntos_fuertes:S.evalData.puntosFuertes,
+    areas_mejora:S.evalData.mejorar,
+    consejo:S.evalData.consejo
+  });
+
+  hideLoader();showView('results');renderResults(S.evalData);
+}
+
+function fallbackData(){
+  return{puntuacion:68,nivel:'Bueno',resumen:'Has completado la entrevista satisfactoriamente.',
+    puntosFuertes:['Comunicación clara','Actitud positiva','Conocimiento del sector'],
+    mejorar:['Estructurar con método STAR','Aportar ejemplos con datos','Preparar preguntas para el entrevistador'],
+    consejo:'Practica con el método STAR: Situación, Tarea, Acción y Resultado.'};
+}
+
+function renderResults(d){
+  document.getElementById('resultsTitle').textContent=`Tu puntuación: ${d.puntuacion}/100`;
+  document.getElementById('resultsSubtitle').textContent=`${S.puesto} · ${S.nombre} · ${new Date().toLocaleDateString('es-ES')}`;
+  const col=d.puntuacion>=75?'#2d6a4f':d.puntuacion>=55?'#b7621b':'#c0392b';
+  const bg=d.puntuacion>=75?'#d8f3dc':d.puntuacion>=55?'#fef3e2':'#fde8d8';
+  document.getElementById('resultsContent').innerHTML=`
+    <div class="score-card">
+      <div class="score-circle" style="background:${bg}">
+        <div class="score-num" style="color:${col}">${d.puntuacion}</div>
+        <div class="score-label" style="color:${col}">/ 100</div>
+      </div>
+      <div class="score-details"><h3>${d.nivel}</h3><p>${d.resumen}</p></div>
+    </div>
+    <div class="feedback-section">
+      <h3><span class="tag-pos">Puntos fuertes</span></h3>
+      <ul>${(d.puntosFuertes||[]).map(p=>`<li>${p}</li>`).join('')}</ul>
+    </div>
+    <div class="feedback-section">
+      <h3><span class="tag-imp">Areas de mejora</span></h3>
+      <ul>${(d.mejorar||[]).map(p=>`<li>${p}</li>`).join('')}</ul>
+    </div>
+    <div class="feedback-section" style="border-left:3px solid #2d6a4f">
+      <h3>Consejo clave</h3><p>${d.consejo}</p>
+    </div>`;
+}
+
+function downloadPDF(){
+  const btn=document.getElementById('downloadBtn');
+  btn.disabled=true;btn.textContent='Generando PDF...';
+  try{
+    const{jsPDF}=window.jspdf;
+    const doc=new jsPDF({unit:'mm',format:'a4'});
+    const W=210,margin=20,cW=W-margin*2;let y=margin;
+    const checkPage=(n)=>{if(y+n>285){doc.addPage();y=margin;}};
+    doc.setFillColor(45,106,79);doc.rect(0,0,W,32,'F');
+    doc.setFontSize(22);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+    doc.text('EntrIA Pro',margin,20);
+    doc.setFontSize(10);doc.setFont('helvetica','normal');
+    doc.text('Informe de Simulacro de Entrevista',margin,27);y=44;
+    doc.setFillColor(237,233,224);doc.roundedRect(margin,y,cW,22,3,3,'F');
+    doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(90,86,80);
+    doc.text('CANDIDATO',margin+6,y+7);doc.text('PUESTO',margin+70,y+7);doc.text('FECHA',margin+145,y+7);
+    doc.setFont('helvetica','normal');doc.setTextColor(26,24,20);
+    doc.text(S.nombre,margin+6,y+15);doc.text(S.puesto.substring(0,30),margin+70,y+15);
+    doc.text(new Date().toLocaleDateString('es-ES'),margin+145,y+15);y+=30;
+    const d=S.evalData;
+    const sc=d.puntuacion>=75?[45,106,79]:d.puntuacion>=55?[183,98,27]:[192,57,43];
+    doc.setFillColor(...sc);doc.roundedRect(margin,y,cW,28,3,3,'F');
+    doc.setFontSize(26);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+    doc.text(`${d.puntuacion}/100`,margin+8,y+19);
+    doc.setFontSize(13);doc.setFont('helvetica','normal');doc.text(d.nivel,margin+56,y+13);
+    doc.setFontSize(9);const rl=doc.splitTextToSize(d.resumen,cW-65);
+    doc.text(rl,margin+56,y+20);y+=36;
+    const section=(title,items,col)=>{
+      checkPage(16+items.length*9);
+      doc.setFontSize(12);doc.setFont('helvetica','bold');doc.setTextColor(...col);
+      doc.text(title,margin,y);y+=5;doc.setDrawColor(...col);doc.line(margin,y,W-margin,y);y+=7;
+      items.forEach(p=>{
+        checkPage(10);const ls=doc.splitTextToSize(p,cW-8);
+        doc.setFontSize(9.5);doc.setFont('helvetica','normal');doc.setTextColor(26,24,20);
+        doc.text(ls,margin+6,y);y+=ls.length*6+3;
+      });y+=4;
+    };
+    section('Puntos fuertes',d.puntosFuertes||[],[45,106,79]);
+    section('Areas de mejora',d.mejorar||[],[181,69,27]);
+    checkPage(26);
+    doc.setFillColor(216,243,220);doc.roundedRect(margin,y,cW,22,3,3,'F');
+    doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(45,106,79);
+    doc.text('Consejo clave',margin+6,y+8);
+    doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(26,24,20);
+    const cl=doc.splitTextToSize(d.consejo||'',cW-12);
+    doc.text(cl,margin+6,y+15);y+=26+cl.length*1.5;
+    doc.addPage();y=margin;
+    doc.setFillColor(26,24,20);doc.rect(0,0,W,16,'F');
+    doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
+    doc.text('Transcripcion completa',margin,11);y=24;
+    S.history.filter(m=>m.role!=='system').forEach(m=>{
+      const isAI=m.role==='assistant';
+      const speaker=isAI?'Entrevistador (EntrIA)':S.nombre;
+      const txt=m.content.replace('ENTREVISTA_COMPLETADA','').trim();
+      const colT=isAI?[45,106,79]:[26,24,20];
+      const bgC=isAI?[240,248,244]:[248,246,242];
+      const ls=doc.splitTextToSize(txt,cW-10);
+      const bH=ls.length*5.5+14;checkPage(bH);
+      doc.setFillColor(...bgC);doc.roundedRect(margin,y,cW,bH,2,2,'F');
+      if(isAI){doc.setFillColor(45,106,79);doc.roundedRect(margin,y,3,bH,1,1,'F');}
+      doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.setTextColor(...colT);
+      doc.text(speaker,margin+6,y+7);
+      doc.setFont('helvetica','normal');doc.setTextColor(26,24,20);doc.setFontSize(9);
+      doc.text(ls,margin+6,y+13);y+=bH+4;
+    });
+    const total=doc.internal.getNumberOfPages();
+    for(let p=1;p<=total;p++){
+      doc.setPage(p);doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.setTextColor(160,156,150);
+      doc.text(`EntrIA Pro | Pagina ${p} de ${total}`,margin,292);doc.text('entria.es',W-margin,292,{align:'right'});
+    }
+    doc.save(`EntrIA_Pro_${S.nombre}_${S.puesto.replace(/\s+/g,'_').substring(0,20)}.pdf`);
+  }catch(e){alert('Error generando PDF.');}
+  btn.disabled=false;
+  btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> Descargar PDF';
+}
+
+function loader(txt){document.getElementById('loaderText').textContent=txt;document.getElementById('loader').style.display='flex';}
+function hideLoader(){document.getElementById('loader').style.display='none';}
+
+async function api(sys,msgs){
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,system:sys,messages:msgs})
+  });
+  if(!r.ok)throw new Error('API error');
+  const d=await r.json();return d?.content?.[0]?.text||'';
+}
+</script>
+</body>
+</html>
