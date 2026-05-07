@@ -238,7 +238,7 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
       <li>Preguntas adaptadas a la oferta real</li>
       <li>Acceso prioritario a nuevas funciones</li>
     </ul>
-    <button class="paywall-btn" onclick="contactPro()">Quiero EntrIA Pro — 4,99 EUR</button>
+    <div style="margin-bottom:16px;text-align:left"><label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">Tu email</label><input type="email" id="paywallEmail" placeholder="tu@email.com" style="width:100%;background:white;border:1px solid rgba(26,24,20,0.12);border-radius:8px;padding:11px 14px;font-family:Instrument Sans,sans-serif;font-size:15px;color:#1a1814;outline:none"></div><div style="font-size:12px;color:#5a5650;margin-bottom:16px;text-align:left">Usa el mismo email con el que accederas a EntrIA Pro</div><button class="paywall-btn" id="paywallBtn" onclick="startCheckout()">Pagar 4,99 EUR con tarjeta →</button>
     <button class="paywall-back" onclick="closePaywall()">Seguir con la versión gratuita</button>
   </div>
 </div>
@@ -445,7 +445,7 @@ window.addEventListener('load',async()=>{
   const{data:{session}}=await supa.auth.getSession();
   if(session?.user){
     const{data}=await supa.from('profiles').select('is_pro').eq('id',session.user.id).single();
-    if(data?.is_pro) window.location.href='pro.html';
+    if(data?.is_pro) window.location.href='https://entriajobs.com/pro.html';
   }
 });
 
@@ -469,7 +469,7 @@ async function handleLogin(){
   // Check pro status
   const{data:profile}=await supa.from('profiles').select('is_pro').eq('id',data.user.id).single();
   if(profile?.is_pro){
-    window.location.href='pro.html';
+    window.location.href='https://entriajobs.com/pro.html';
   } else {
     errEl.textContent='Tu cuenta no tiene acceso Pro. ¿Quieres conseguirlo?';errEl.style.display='block';
     btn.disabled=false;btn.textContent='Iniciar sesión';
@@ -478,7 +478,8 @@ async function handleLogin(){
 
 // PAYWALL
 function showPaywall(){document.getElementById('paywallModal').style.display='flex';}
-function closePaywall(){document.getElementById('paywallModal').style.display='none';}
+function closePaywall(){document.getElementById("paywallModal").style.display="none";}
+async function startCheckout(){const email=document.getElementById("paywallEmail").value.trim();if(!email||!email.includes("@")){alert("Por favor introduce un email valido.");return;}const btn=document.getElementById("paywallBtn");btn.disabled=true;btn.textContent="Redirigiendo al pago...";try{const res=await fetch("https://entria-proxy.jobwinspain.workers.dev/checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});const data=await res.json();if(data.url){window.location.href=data.url;}else{alert("Error al iniciar el pago.");btn.disabled=false;btn.textContent="Pagar 4,99 EUR con tarjeta 2192";}}catch(e){alert("Error de conexion.");btn.disabled=false;btn.textContent="Pagar 4,99 EUR con tarjeta 2192";}}
 function contactPro(){
   window.open('mailto:hola@entria.es?subject=Quiero%20EntrIA%20Pro&body=Hola%2C%20quiero%20el%20acceso%20Pro%20por%204%2C99%20EUR.%20Mi%20email%20es%3A%20','_blank');
 }
