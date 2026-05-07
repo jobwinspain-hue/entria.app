@@ -193,20 +193,18 @@ textarea{resize:vertical;min-height:120px;line-height:1.6}
 <div class="app">
   <!-- SIDEBAR -->
   <div class="sidebar">
-    <div class="sidebar-logo">
+    <div class="sidebar-logo" onclick="showView('dashboard')" style="cursor:pointer;flex-direction:column;gap:4px;align-items:center">
       <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
         <rect width="32" height="32" rx="8" fill="#52b788"/>
         <polyline points="5,17 10,22 18,11" stroke="rgba(255,255,255,0.4)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         <polyline points="10,17 15,22 26,11" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       </svg>
       <div class="sidebar-logo-text">Entr<span>IA</span> <span class="pro-chip">PRO</span></div>
+      <div style="font-size:10px;color:var(--ink2);font-weight:500;letter-spacing:0.3px">Inicio</div>
     </div>
 
     <div class="sidebar-section">Menú</div>
-    <button class="sidebar-btn active" id="btnDash" onclick="showView('dashboard')">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
-      Inicio
-    </button>
+
     <button class="sidebar-btn" id="btnNew" onclick="showView('setup')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
       Nueva
@@ -390,7 +388,7 @@ function showView(v){
   const viewId='view'+v.charAt(0).toUpperCase()+v.slice(1);
   const el=document.getElementById(viewId);
   if(el) el.classList.add('active');
-  if(v==='dashboard'){document.getElementById('btnDash').classList.add('active');loadHistory();}
+  if(v==='dashboard'){const bd=document.getElementById('btnDash');if(bd)bd.classList.add('active');loadHistory();}
   else if(v==='setup'){document.getElementById('btnNew').classList.add('active');resetState();}
   else if(v==='history'){document.getElementById('viewDashboard').classList.add('active');document.getElementById('btnHistory').classList.add('active');loadHistory();setTimeout(()=>{const h=document.getElementById('historyList');if(h)h.scrollIntoView({behavior:'smooth'});},400);}
   else if(v==='interview'){}
