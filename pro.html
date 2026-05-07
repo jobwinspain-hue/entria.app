@@ -356,7 +356,9 @@ function showView(v){
 let historyData=[];
 
 async function loadHistory(){
-  const{data}=await supa.from('entrevistas').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  if(!currentUser)return;
+  const{data,error}=await supa.from('entrevistas').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  if(error){console.error('Error cargando historial:',error);return;}
   historyData=data||[];
   renderStats();
   renderHistory();
@@ -372,9 +374,7 @@ function renderStats(){
   document.getElementById('statMedia').textContent=media||'—';
   document.getElementById('statMejor').textContent=mejor||'—';
   // Greeting by time
-  const h=new Date().getHours();
-  const greet=h<12?'Buenos días':h<18?'Buenas tardes':'Buenas noches';
-  document.querySelector('.dash-header h1').textContent=greet+' 👋';
+  document.querySelector('.dash-header h1').textContent='Entrena tus entrevistas con EntrIA';
 }
 
 function renderHistory(){
