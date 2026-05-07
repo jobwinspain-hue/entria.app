@@ -5,30 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EntrIA — Simulador de entrevistas con IA</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#f5f2ec;--bg2:#ede9e0;--ink:#1a1814;--ink2:#5a5650;
-  --accent:#2d6a4f;--accent2:#52b788;--accent-light:#d8f3dc;
-  --border:rgba(26,24,20,0.12);
-}
-html,body{height:100%;background:var(--bg);color:var(--ink);font-family:'Instrument Sans',sans-serif}
+:root{--bg:#f5f2ec;--bg2:#ede9e0;--ink:#1a1814;--ink2:#5a5650;--accent:#2d6a4f;--accent2:#52b788;--accent-light:#d8f3dc;--border:rgba(26,24,20,0.12)}
+html,body{min-height:100%;background:var(--bg);color:var(--ink);font-family:'Instrument Sans',sans-serif}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* NAV */
 nav{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:50}
-.nav-logo{display:flex;align-items:center;gap:10px}
-.logo{font-family:'Instrument Sans',sans-serif;font-size:20px;font-weight:600;letter-spacing:-0.3px;color:var(--ink)}
+.nav-logo{display:flex;align-items:center;gap:10px;cursor:pointer}
+.logo{font-family:'Instrument Sans',sans-serif;font-size:20px;font-weight:600;letter-spacing:-0.3px}
 .logo span{color:var(--accent)}
+.nav-right{display:flex;align-items:center;gap:12px}
 .nav-badge{font-size:12px;background:var(--accent-light);color:var(--accent);padding:4px 12px;border-radius:20px;font-weight:500}
+.nav-login{font-size:14px;color:var(--ink2);background:none;border:1px solid var(--border);padding:7px 16px;border-radius:6px;cursor:pointer;font-family:'Instrument Sans',sans-serif;font-weight:500;transition:all .15s}
+.nav-login:hover{border-color:var(--ink);color:var(--ink)}
 
-/* LANDING */
 #landing{min-height:100vh;display:flex;flex-direction:column}
-
-/* HERO */
 .hero{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:90px 48px 80px;text-align:center;position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(82,183,136,0.1) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
 .hero-tag{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--accent);background:var(--accent-light);padding:5px 14px;border-radius:20px;margin-bottom:32px;font-weight:500;animation:fadeUp .6s ease both}
@@ -42,7 +37,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:20px 4
 .btn-outline:hover{background:var(--ink);color:var(--bg)}
 .stats{display:flex;gap:56px;margin-top:64px;animation:fadeUp .6s .4s ease both}
 .stat{text-align:center}
-.stat-num{font-family:'DM Serif Display',serif;font-size:36px;font-weight:400;color:var(--ink);line-height:1}
+.stat-num{font-family:'DM Serif Display',serif;font-size:36px;font-weight:400;line-height:1}
 .stat-label{font-size:13px;color:var(--ink2);margin-top:4px}
 
 /* HOW IT WORKS */
@@ -50,22 +45,85 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:20px 4
 .how-header{text-align:center;margin-bottom:56px}
 .how-header h2{font-family:'DM Serif Display',serif;font-size:clamp(30px,4vw,48px);font-weight:400;letter-spacing:-0.3px;margin-bottom:12px}
 .how-header p{font-size:16px;color:var(--ink2);max-width:480px;margin:0 auto;line-height:1.7}
-.steps{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;position:relative}
-.steps::before{content:'';position:absolute;top:36px;left:calc(16.66% + 24px);right:calc(16.66% + 24px);height:1.5px;background:linear-gradient(to right,var(--accent-light),var(--accent),var(--accent-light));z-index:0}
-.step{display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 24px;position:relative;z-index:1}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+.steps::before{content:'';position:absolute;top:36px;left:calc(12.5% + 16px);right:calc(12.5% + 16px);height:1.5px;background:linear-gradient(to right,var(--accent-light),var(--accent),var(--accent-light));z-index:0}
+.step{display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 16px;position:relative;z-index:1}
 .step-num{width:72px;height:72px;border-radius:50%;background:white;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:24px;position:relative;transition:border-color .2s,box-shadow .2s}
 .step-num:hover{border-color:var(--accent);box-shadow:0 0 0 6px var(--accent-light)}
 .step-icon{font-size:26px}
-.step h3{font-family:'DM Serif Display',serif;font-size:20px;font-weight:400;margin-bottom:10px;color:var(--ink)}
-.step p{font-size:14px;color:var(--ink2);line-height:1.7;max-width:220px}
-.step-badge{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:white;font-size:11px;font-weight:600;font-family:'Instrument Sans',sans-serif;display:flex;align-items:center;justify-content:center}
+.step h3{font-family:'DM Serif Display',serif;font-size:18px;font-weight:400;margin-bottom:8px}
+.step p{font-size:13px;color:var(--ink2);line-height:1.7;max-width:180px}
+.step-badge{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:white;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.step.pro-step .step-num{border-color:rgba(201,169,110,0.4);background:linear-gradient(135deg,#fdfaf5,#f5f0e8)}
+.step.pro-step .step-badge{background:linear-gradient(135deg,#c9a96e,#e8c88a);color:#1a1814}
+.pro-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#b7621b;background:#fef3e2;padding:2px 8px;border-radius:10px;font-weight:600;margin-bottom:6px}
 
-/* CTA SECTION */
-.cta-section{background:var(--ink);padding:72px 48px;text-align:center;margin-top:0}
+/* PRICING */
+.pricing{padding:80px 48px;border-top:1px solid var(--border);text-align:center}
+.pricing h2{font-family:'DM Serif Display',serif;font-size:clamp(28px,4vw,44px);font-weight:400;margin-bottom:12px;letter-spacing:-0.3px}
+.pricing-sub{font-size:16px;color:var(--ink2);margin-bottom:48px}
+.pricing-cards{display:flex;gap:24px;justify-content:center;max-width:700px;margin:0 auto}
+.pricing-card{flex:1;background:white;border:1px solid var(--border);border-radius:16px;padding:32px;text-align:left}
+.pricing-card.featured{background:var(--ink);color:white;border-color:var(--ink)}
+.pricing-card h3{font-family:'DM Serif Display',serif;font-size:22px;font-weight:400;margin-bottom:8px}
+.pricing-card.featured h3{color:white}
+.price{font-family:'DM Serif Display',serif;font-size:42px;color:var(--accent);line-height:1;margin:16px 0 4px}
+.pricing-card.featured .price{color:var(--accent2)}
+.price-note{font-size:13px;color:var(--ink2);margin-bottom:24px}
+.pricing-card.featured .price-note{color:rgba(255,255,255,0.5)}
+.pricing-features{list-style:none;margin-bottom:28px}
+.pricing-features li{font-size:14px;color:var(--ink2);padding:6px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.pricing-card.featured .pricing-features li{color:rgba(255,255,255,0.8);border-color:rgba(255,255,255,0.1)}
+.pricing-features li::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0}
+.pricing-card.featured .pricing-features li::before{color:var(--accent2)}
+.pricing-features li.disabled{opacity:.4}
+.pricing-features li.disabled::before{content:'✕';color:var(--ink2)}
+.btn-pricing{width:100%;border:none;padding:14px;border-radius:8px;font-family:'Instrument Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-pricing.free{background:var(--bg2);color:var(--ink)}
+.btn-pricing.free:hover{background:var(--bg)}
+.btn-pricing.pro{background:var(--accent2);color:var(--ink)}
+.btn-pricing.pro:hover{background:#40a875;transform:translateY(-1px)}
+
+.cta-section{background:var(--ink);padding:72px 48px;text-align:center}
 .cta-section h2{font-family:'DM Serif Display',serif;font-size:clamp(28px,4vw,46px);font-weight:400;color:white;margin-bottom:16px;letter-spacing:-0.3px}
 .cta-section p{font-size:16px;color:rgba(255,255,255,0.6);margin-bottom:36px;max-width:420px;margin-left:auto;margin-right:auto;line-height:1.7}
 .btn-cta{background:var(--accent2);color:var(--ink);border:none;padding:16px 36px;border-radius:8px;font-family:'Instrument Sans',sans-serif;font-size:16px;font-weight:600;cursor:pointer;transition:transform .15s,background .15s}
 .btn-cta:hover{background:#40a875;transform:translateY(-2px)}
+
+/* AUTH MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(26,24,20,0.5);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px)}
+.modal{background:var(--bg);border-radius:16px;padding:40px;width:100%;max-width:420px;position:relative;animation:fadeUp .3s ease}
+.modal h2{font-family:'DM Serif Display',serif;font-size:26px;font-weight:400;margin-bottom:6px}
+.modal p{color:var(--ink2);font-size:14px;margin-bottom:28px;line-height:1.6}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--ink2)}
+.modal-close:hover{color:var(--ink)}
+.modal .form-group{margin-bottom:16px}
+.modal label{display:block;font-size:13px;font-weight:500;margin-bottom:5px}
+.modal input{width:100%;background:white;border:1px solid var(--border);border-radius:8px;padding:11px 14px;font-family:'Instrument Sans',sans-serif;font-size:15px;color:var(--ink);outline:none;transition:border-color .15s}
+.modal input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,106,79,0.08)}
+.modal-btn{width:100%;background:var(--ink);color:var(--bg);border:none;padding:14px;border-radius:8px;font-family:'Instrument Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px;transition:background .15s}
+.modal-btn:hover{background:var(--accent)}
+.modal-btn:disabled{opacity:.5;cursor:not-allowed}
+.modal-switch{text-align:center;margin-top:16px;font-size:14px;color:var(--ink2)}
+.modal-switch a{color:var(--accent);cursor:pointer;font-weight:600;text-decoration:none}
+.modal-switch a:hover{text-decoration:underline}
+.modal-error{color:#c0392b;font-size:13px;margin-top:8px;padding:8px 12px;background:#fde8d8;border-radius:6px;display:none}
+
+/* PAYWALL */
+.paywall-overlay{position:fixed;inset:0;background:rgba(26,24,20,0.6);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px)}
+.paywall{background:var(--bg);border-radius:20px;padding:48px 40px;width:100%;max-width:460px;text-align:center;animation:fadeUp .3s ease}
+.paywall-icon{font-size:48px;margin-bottom:16px}
+.paywall h2{font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;margin-bottom:12px}
+.paywall p{color:var(--ink2);font-size:15px;line-height:1.7;margin-bottom:24px;max-width:340px;margin-left:auto;margin-right:auto}
+.paywall-price{font-family:'DM Serif Display',serif;font-size:52px;color:var(--accent);line-height:1}
+.paywall-price-sub{font-size:13px;color:var(--ink2);margin-bottom:28px;margin-top:4px}
+.paywall-features{text-align:left;background:white;border-radius:12px;padding:20px 24px;margin-bottom:28px;border:1px solid var(--border)}
+.paywall-features li{font-size:14px;color:var(--ink2);line-height:1.9;list-style:none}
+.paywall-features li::before{content:'✓ ';color:var(--accent);font-weight:700}
+.paywall-btn{width:100%;background:var(--accent);color:white;border:none;padding:16px;border-radius:10px;font-family:'Instrument Sans',sans-serif;font-size:16px;font-weight:600;cursor:pointer;transition:all .15s;margin-bottom:12px}
+.paywall-btn:hover{background:#1f4f38;transform:translateY(-1px)}
+.paywall-back{background:none;border:none;color:var(--ink2);font-size:14px;cursor:pointer;font-family:'Instrument Sans',sans-serif}
+.paywall-back:hover{color:var(--ink)}
 
 /* SETUP */
 #setup{display:none;min-height:100vh;padding:48px;max-width:720px;margin:0 auto}
@@ -79,19 +137,18 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
 .row-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .start-btn{width:100%;background:var(--ink);color:var(--bg);border:none;padding:16px;border-radius:8px;font-family:'Instrument Sans',sans-serif;font-size:16px;font-weight:600;cursor:pointer;margin-top:8px;transition:background .15s,transform .15s}
 .start-btn:hover{background:var(--accent);transform:translateY(-1px)}
-.start-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
 
 /* INTERVIEW */
 #interview{display:none;flex-direction:column;height:100vh}
 .interview-header{display:flex;align-items:center;justify-content:space-between;padding:14px 32px;border-bottom:1px solid var(--border);background:white;flex-shrink:0}
-.interview-logo{display:flex;align-items:center;gap:8px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:17px;color:var(--ink)}
+.interview-logo{display:flex;align-items:center;gap:8px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:17px}
 .interview-logo span{color:var(--accent)}
 .progress-area{display:flex;align-items:center;gap:14px}
 .q-counter{font-size:13px;color:var(--ink2);font-weight:500}
 .progress-bar{width:140px;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden}
 .progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease;width:0%}
-.interview-body{flex:1;overflow:hidden;display:flex}
-.chat-area{flex:1;overflow-y:auto;padding:32px;display:flex;flex-direction:column;gap:18px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.free-badge{font-size:11px;background:#fef3e2;color:#b7621b;padding:3px 10px;border-radius:20px;font-weight:600}
+.chat-area{flex:1;overflow-y:auto;padding:32px;display:flex;flex-direction:column;gap:18px;scrollbar-width:thin}
 .msg{display:flex;gap:12px;max-width:76%;animation:fadeUp .3s ease}
 .msg.ai{align-self:flex-start}
 .msg.user{align-self:flex-end;flex-direction:row-reverse}
@@ -106,14 +163,15 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
 .typing-indicator span:nth-child(2){animation-delay:.2s}
 .typing-indicator span:nth-child(3){animation-delay:.4s}
 .input-footer{padding:18px 32px;border-top:1px solid var(--border);background:white;display:flex;gap:12px;align-items:flex-end;flex-shrink:0}
-.input-footer textarea{flex:1;min-height:50px;max-height:120px;padding:13px 17px;border-radius:10px;font-size:15px;resize:none}
+.input-footer textarea{flex:1;min-height:50px;max-height:120px;padding:13px 17px;border-radius:10px;font-size:15px;resize:none;background:white;border:1px solid var(--border);font-family:'Instrument Sans',sans-serif;color:var(--ink);outline:none}
+.input-footer textarea:focus{border-color:var(--accent)}
 .send-btn{height:50px;padding:0 22px;background:var(--ink);color:var(--bg);border:none;border-radius:10px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:background .15s;flex-shrink:0}
 .send-btn:hover{background:var(--accent)}
 .send-btn:disabled{opacity:.4;cursor:not-allowed}
-.review-banner{margin:14px 32px;padding:16px 22px;background:linear-gradient(135deg,var(--accent-light),#b7e4c7);border:1px solid rgba(45,106,79,0.2);border-radius:12px;display:none;align-items:center;justify-content:space-between;gap:16px;animation:fadeUp .4s ease;flex-shrink:0}
+.review-banner{margin:14px 32px;padding:16px 22px;background:linear-gradient(135deg,var(--accent-light),#b7e4c7);border:1px solid rgba(45,106,79,0.2);border-radius:12px;display:none;align-items:center;justify-content:space-between;gap:16px;flex-shrink:0;animation:fadeUp .4s ease}
 .review-banner p{font-size:14px;color:var(--accent);font-weight:500}
-.btn-results{background:var(--accent);color:white;border:none;padding:11px 22px;border-radius:8px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:transform .15s,background .15s;white-space:nowrap}
-.btn-results:hover{background:#1f4f38;transform:translateY(-1px)}
+.btn-results{background:var(--accent);color:white;border:none;padding:11px 22px;border-radius:8px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap}
+.btn-results:hover{background:#1f4f38}
 
 /* RESULTS */
 #results{display:none;min-height:100vh;padding:48px;max-width:760px;margin:0 auto}
@@ -126,38 +184,69 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
 .score-details p{color:var(--ink2);font-size:14px;line-height:1.6}
 .feedback-section{background:white;border:1px solid var(--border);border-radius:14px;padding:26px 30px;margin-bottom:14px}
 .feedback-section h3{font-size:15px;font-weight:600;margin-bottom:12px}
-.feedback-section p,.feedback-section li{font-size:14px;color:var(--ink2);line-height:1.7;margin-bottom:6px}
+.feedback-section li{font-size:14px;color:var(--ink2);line-height:1.7;margin-bottom:6px}
+.feedback-section p{font-size:14px;color:var(--ink2);line-height:1.7}
 .feedback-section ul{padding-left:18px}
 .tag-pos{color:#2d6a4f;background:#d8f3dc;padding:2px 9px;border-radius:4px;font-size:12px;font-weight:500}
 .tag-imp{color:#b5451b;background:#fde8d8;padding:2px 9px;border-radius:4px;font-size:12px;font-weight:500}
 .results-actions{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}
 .btn-repeat{background:var(--ink);color:var(--bg);border:none;padding:13px 26px;border-radius:8px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:15px;cursor:pointer;transition:background .15s}
 .btn-repeat:hover{background:var(--accent)}
-.btn-download{background:var(--accent);color:white;border:none;padding:13px 22px;border-radius:8px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:15px;cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:8px}
-.btn-download:hover{background:#1f4f38}
-.btn-download:disabled{opacity:.6;cursor:not-allowed}
-.freemium-banner{background:linear-gradient(135deg,#1a1814,#2d3a2e);color:white;padding:14px 22px;border-radius:10px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;gap:16px}
-.freemium-banner p{font-size:14px;opacity:.9}
-.freemium-banner strong{color:var(--accent2)}
-.btn-pro{background:var(--accent2);color:#1a1814;border:none;padding:8px 16px;border-radius:6px;font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap}
 .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--ink2);font-size:14px;cursor:pointer;margin-bottom:30px;transition:color .15s;background:none;border:none;font-family:'Instrument Sans',sans-serif}
 .back-link:hover{color:var(--ink)}
-#loader{position:fixed;inset:0;background:rgba(245,242,236,0.92);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:100;gap:16px}
+#loader{position:fixed;inset:0;background:rgba(245,242,236,0.92);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:300;gap:16px}
 .spinner{width:38px;height:38px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
 #loader p{font-family:'Instrument Sans',sans-serif;font-weight:500;color:var(--ink);font-size:16px}
 </style>
 </head>
 <body>
 
-<div id="loader">
-  <div class="spinner"></div>
-  <p id="loaderText">Preparando tu entrevista...</p>
+<div id="loader"><div class="spinner"></div><p id="loaderText">Cargando...</p></div>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h2>Accede a EntrIA</h2>
+    <p>Inicia sesión con tu cuenta Pro para continuar practicando sin límites.</p>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="authEmail" placeholder="tu@email.com">
+    </div>
+    <div class="form-group">
+      <label>Contraseña</label>
+      <input type="password" id="authPassword" placeholder="••••••••">
+    </div>
+    <div class="modal-error" id="authError"></div>
+    <button class="modal-btn" id="authBtn" onclick="handleLogin()">Iniciar sesión</button>
+    <p class="modal-switch">¿No tienes cuenta? <a onclick="closeModal();showPaywall()">Hazte Pro →</a></p>
+  </div>
+</div>
+
+<!-- PAYWALL -->
+<div class="paywall-overlay" id="paywallModal">
+  <div class="paywall">
+    <div class="paywall-icon">🚀</div>
+    <h2>Consigue EntrIA Pro</h2>
+    <p>Practica sin límites hasta conseguir el trabajo que mereces.</p>
+    <div class="paywall-price">4,99 EUR</div>
+    <div class="paywall-price-sub">pago único — tuyo para siempre</div>
+    <ul class="paywall-features">
+      <li>Entrevistas ilimitadas</li>
+      <li>Historial de progreso y evolución</li>
+      <li>Descarga tu informe en PDF</li>
+      <li>Preguntas adaptadas a la oferta real</li>
+      <li>Acceso prioritario a nuevas funciones</li>
+    </ul>
+    <button class="paywall-btn" onclick="contactPro()">Quiero EntrIA Pro — 4,99 EUR</button>
+    <button class="paywall-back" onclick="closePaywall()">Seguir con la versión gratuita</button>
+  </div>
 </div>
 
 <!-- LANDING -->
 <div id="landing">
   <nav>
-    <div class="nav-logo">
+    <div class="nav-logo" onclick="showLanding()">
       <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
         <rect width="32" height="32" rx="8" fill="#2d6a4f"/>
         <polyline points="5,17 10,22 18,11" stroke="rgba(255,255,255,0.35)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -165,10 +254,12 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
       </svg>
       <div class="logo">Entr<span>IA</span></div>
     </div>
-    <div class="nav-badge">Beta gratuita</div>
+    <div class="nav-right">
+      <div class="nav-badge">Beta gratuita</div>
+      <button class="nav-login" onclick="openModal()">Iniciar sesión</button>
+    </div>
   </nav>
 
-  <!-- HERO -->
   <div class="hero">
     <div class="hero-tag">Adaptado al mercado laboral español</div>
     <h1>Practica tu entrevista.<br>Consigue el <em>trabajo</em>.</h1>
@@ -178,22 +269,13 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
       <button class="btn-outline" onclick="document.getElementById('como').scrollIntoView({behavior:'smooth'})">Ver cómo funciona ↓</button>
     </div>
     <div class="stats">
-      <div class="stat">
-        <div class="stat-num">8</div>
-        <div class="stat-label">Preguntas por sesión</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">100%</div>
-        <div class="stat-label">En español</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">Gratis</div>
-        <div class="stat-label">Para empezar</div>
-      </div>
+      <div class="stat"><div class="stat-num">5</div><div class="stat-label">Preguntas gratuitas</div></div>
+      <div class="stat"><div class="stat-num">100%</div><div class="stat-label">En español</div></div>
+      <div class="stat"><div class="stat-num">Gratis</div><div class="stat-label">Para empezar</div></div>
     </div>
   </div>
 
-  <!-- CÓMO FUNCIONA -->
+  <!-- CÓMO FUNCIONA — 4 pasos -->
   <section id="como" class="how">
     <div class="how-header">
       <h2>Tan fácil como una conversación</h2>
@@ -201,33 +283,63 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
     </div>
     <div class="steps">
       <div class="step">
-        <div class="step-num">
-          <div class="step-badge">1</div>
-          <div class="step-icon">📋</div>
-        </div>
+        <div class="step-num"><div class="step-badge">1</div><div class="step-icon">📋</div></div>
         <h3>Configura</h3>
-        <p>Indica el puesto, el sector y pega la oferta de trabajo. EntrIA se adapta a cada vacante concreta.</p>
+        <p>Indica el puesto y pega la oferta. EntrIA adapta las preguntas a cada vacante.</p>
       </div>
       <div class="step">
-        <div class="step-num">
-          <div class="step-badge">2</div>
-          <div class="step-icon">💬</div>
-        </div>
+        <div class="step-num"><div class="step-badge">2</div><div class="step-icon">💬</div></div>
         <h3>Practica</h3>
-        <p>Responde 8 preguntas reales como si fuera una entrevista de verdad. Sin presión, sin juicios, las veces que quieras.</p>
+        <p>Responde preguntas reales como si fuera una entrevista de verdad. Sin presión.</p>
       </div>
       <div class="step">
-        <div class="step-num">
-          <div class="step-badge">3</div>
-          <div class="step-icon">📄</div>
-        </div>
-        <h3>Mejora</h3>
-        <p>Recibe tu puntuación, puntos fuertes, áreas de mejora y descarga el informe completo en PDF.</p>
+        <div class="step-num"><div class="step-badge">3</div><div class="step-icon">📊</div></div>
+        <h3>Recibe feedback</h3>
+        <p>Obtén tu puntuación, puntos fuertes y áreas de mejora con un informe descargable.</p>
+      </div>
+      <div class="step pro-step">
+        <div class="step-num"><div class="step-badge" style="background:linear-gradient(135deg,#c9a96e,#e8c88a);color:#1a1814">★</div><div class="step-icon">📈</div></div>
+        <h3>Evoluciona</h3>
+        <div class="pro-tag">Solo Pro</div>
+        <p>Sigue tu progreso entrevista tras entrevista y ve cómo mejora tu puntuación con el tiempo.</p>
       </div>
     </div>
   </section>
 
-  <!-- CTA FINAL -->
+  <!-- PRICING -->
+  <section class="pricing">
+    <h2>Simple y sin sorpresas</h2>
+    <p class="pricing-sub">Sin suscripciones. Pagas una vez y es tuyo para siempre.</p>
+    <div class="pricing-cards">
+      <div class="pricing-card">
+        <h3>Gratuito</h3>
+        <div class="price" style="color:var(--ink2)">0 EUR</div>
+        <div class="price-note">sin tarjeta, sin registro</div>
+        <ul class="pricing-features">
+          <li>5 preguntas por sesión</li>
+          <li>Feedback básico al terminar</li>
+          <li class="disabled">Informe PDF descargable</li>
+          <li class="disabled">Entrevistas ilimitadas</li>
+          <li class="disabled">Historial de progreso</li>
+        </ul>
+        <button class="btn-pricing free" onclick="showSetup()">Empezar gratis</button>
+      </div>
+      <div class="pricing-card featured">
+        <h3>Pro</h3>
+        <div class="price">4,99 EUR</div>
+        <div class="price-note">pago único — para siempre</div>
+        <ul class="pricing-features">
+          <li>Entrevistas ilimitadas</li>
+          <li>Feedback completo y detallado</li>
+          <li>Informe PDF descargable</li>
+          <li>Historial de progreso</li>
+          <li>Preguntas adaptadas a la oferta</li>
+        </ul>
+        <button class="btn-pricing pro" onclick="showPaywall()">Conseguir Pro</button>
+      </div>
+    </div>
+  </section>
+
   <div class="cta-section">
     <h2>¿Tienes una entrevista pronto?</h2>
     <p>Empieza ahora gratis. Sin registro, sin tarjeta. Solo tú y tu próximo trabajo.</p>
@@ -240,10 +352,6 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
   <button class="back-link" onclick="showLanding()">← Volver</button>
   <h2>Configura tu entrevista</h2>
   <p class="subtitle">Cuéntanos sobre el puesto y personalizaremos las preguntas para ti.</p>
-  <div class="freemium-banner">
-    <p>Primera entrevista <strong>completamente gratis</strong>. Sin tarjeta ni registro.</p>
-    <button class="btn-pro">Pro — 9 EUR/mes</button>
-  </div>
   <div class="form-group">
     <label>Puesto al que aspiras *</label>
     <input type="text" id="puesto" placeholder="Ej: Comercial B2B, Desarrollador Frontend, Contable...">
@@ -277,7 +385,7 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
   </div>
   <div class="form-group">
     <label>Descripción de la oferta (recomendado)</label>
-    <textarea id="oferta" placeholder="Pega aquí el texto de la oferta de InfoJobs, LinkedIn, etc. Cuanta más info, más precisas serán las preguntas..."></textarea>
+    <textarea id="oferta" placeholder="Pega aquí el texto de la oferta de InfoJobs, LinkedIn, etc."></textarea>
   </div>
   <div class="form-group">
     <label>Tu nombre</label>
@@ -287,7 +395,7 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
 </div>
 
 <!-- INTERVIEW -->
-<div id="interview">
+<div id="interview" style="display:none;flex-direction:column;height:100vh">
   <div class="interview-header">
     <div class="interview-logo">
       <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
@@ -298,15 +406,14 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
       Entr<span>IA</span>
     </div>
     <div class="progress-area">
-      <span class="q-counter" id="qCounter">Pregunta 1 de 8</span>
+      <span class="free-badge">Versión gratuita · 5 preguntas</span>
+      <span class="q-counter" id="qCounter">Pregunta 1 de 5</span>
       <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
     </div>
   </div>
-  <div class="interview-body">
-    <div class="chat-area" id="chatArea"></div>
-  </div>
+  <div class="chat-area" id="chatArea"></div>
   <div class="review-banner" id="reviewBanner">
-    <p><strong>Entrevista completada.</strong> Revisa la conversación cuando quieras y pulsa el botón para ver tu informe.</p>
+    <p><strong>Entrevista completada.</strong> Revisa la conversación y pulsa para ver tu informe.</p>
     <button class="btn-results" onclick="generateResults()">Ver mi informe →</button>
   </div>
   <div class="input-footer" id="inputFooter">
@@ -323,23 +430,67 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
   <div id="resultsContent"></div>
   <div class="results-actions">
     <button class="btn-repeat" onclick="showSetup()">Nueva entrevista</button>
-    <button class="btn-download" id="downloadBtn" onclick="downloadPDF()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-      Descargar informe PDF
-    </button>
   </div>
 </div>
 
 <script>
-let S={puesto:'',sector:'',nivel:'',oferta:'',nombre:'',history:[],qCount:0,maxQ:8,loading:false,done:false,evalData:null};
+const SUPA_URL='https://amfpvzbujxkvarqaojnj.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtZnB2emJ1anhrdmFycWFvam5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNjA2ODQsImV4cCI6MjA5MzczNjY4NH0.7B7ggFkRkw6xyybHcNHTBdxi8uSw0votgS6_7jEfqMs';
+const supa=supabase.createClient(SUPA_URL,SUPA_KEY);
 
+let S={puesto:'',sector:'',nivel:'',oferta:'',nombre:'',history:[],qCount:0,maxQ:5,loading:false,done:false,evalData:null};
+
+// Check if already logged in as Pro → redirect
+window.addEventListener('load',async()=>{
+  const{data:{session}}=await supa.auth.getSession();
+  if(session?.user){
+    const{data}=await supa.from('profiles').select('is_pro').eq('id',session.user.id).single();
+    if(data?.is_pro) window.location.href='pro.html';
+  }
+});
+
+// AUTH
+function openModal(){document.getElementById('authModal').style.display='flex';}
+function closeModal(){document.getElementById('authModal').style.display='none';}
+
+async function handleLogin(){
+  const email=document.getElementById('authEmail').value.trim();
+  const pass=document.getElementById('authPassword').value;
+  const errEl=document.getElementById('authError');
+  const btn=document.getElementById('authBtn');
+  errEl.style.display='none';
+  if(!email||!pass){errEl.textContent='Rellena todos los campos.';errEl.style.display='block';return;}
+  btn.disabled=true;btn.textContent='Entrando...';
+  const{data,error}=await supa.auth.signInWithPassword({email,password:pass});
+  if(error){
+    errEl.textContent='Email o contraseña incorrectos.';errEl.style.display='block';
+    btn.disabled=false;btn.textContent='Iniciar sesión';return;
+  }
+  // Check pro status
+  const{data:profile}=await supa.from('profiles').select('is_pro').eq('id',data.user.id).single();
+  if(profile?.is_pro){
+    window.location.href='pro.html';
+  } else {
+    errEl.textContent='Tu cuenta no tiene acceso Pro. ¿Quieres conseguirlo?';errEl.style.display='block';
+    btn.disabled=false;btn.textContent='Iniciar sesión';
+  }
+}
+
+// PAYWALL
+function showPaywall(){document.getElementById('paywallModal').style.display='flex';}
+function closePaywall(){document.getElementById('paywallModal').style.display='none';}
+function contactPro(){
+  window.open('mailto:hola@entria.es?subject=Quiero%20EntrIA%20Pro&body=Hola%2C%20quiero%20el%20acceso%20Pro%20por%204%2C99%20EUR.%20Mi%20email%20es%3A%20','_blank');
+}
+
+// NAV
 function showLanding(){hide('setup');hide('interview');hide('results');show('landing');}
 function showSetup(){hide('landing');hide('interview');hide('results');show('setup');resetState();}
 function show(id){const el=document.getElementById(id);el.style.display=id==='interview'?'flex':'block';}
 function hide(id){document.getElementById(id).style.display='none';}
-function loader(txt){document.getElementById('loaderText').textContent=txt||'Cargando...';document.getElementById('loader').style.display='flex';}
+function loader(txt){document.getElementById('loaderText').textContent=txt;document.getElementById('loader').style.display='flex';}
 function hideLoader(){document.getElementById('loader').style.display='none';}
-function resetState(){S={puesto:'',sector:'',nivel:'',oferta:'',nombre:'',history:[],qCount:0,maxQ:8,loading:false,done:false,evalData:null};}
+function resetState(){S={puesto:'',sector:'',nivel:'',oferta:'',nombre:'',history:[],qCount:0,maxQ:5,loading:false,done:false,evalData:null};}
 
 async function startInterview(){
   const puesto=document.getElementById('puesto').value.trim();
@@ -363,12 +514,12 @@ async function startInterview(){
 
 function buildSystem(){
   return `Eres un entrevistador de RRHH profesional español, directo y cercano.
-Harás exactamente 8 preguntas al candidato ${S.nombre} para el puesto de "${S.puesto}" (sector: ${S.sector}, nivel: ${S.nivel}).
+Harás exactamente 5 preguntas al candidato ${S.nombre} para el puesto de "${S.puesto}" (sector: ${S.sector}, nivel: ${S.nivel}).
 REGLAS:
 - UNA sola pregunta por mensaje. Espera respuesta antes de continuar.
 - Mezcla: motivación, experiencia, competencias conductuales STAR, situacionales y técnicas.
 - Tras cada respuesta, comentario breve (1 frase) y siguiente pregunta.
-- Tras la respuesta a la pregunta 8, cierre breve + ENTREVISTA_COMPLETADA al final.
+- Tras la respuesta a la pregunta 5, cierre breve + ENTREVISTA_COMPLETADA al final.
 - No rompas el personaje.
 ${S.oferta?'\nOFERTA:\n'+S.oferta.substring(0,1500):''}`;
 }
@@ -398,8 +549,8 @@ function showTyping(){
 function hideTyping(){const t=document.getElementById('typing');if(t)t.remove();}
 
 function updateProgress(){
-  document.getElementById('progressFill').style.width=(S.qCount/S.maxQ*100)+'%';
-  document.getElementById('qCounter').textContent=`Pregunta ${S.qCount} de ${S.maxQ}`;
+  document.getElementById('progressFill').style.width=(S.qCount/5*100)+'%';
+  document.getElementById('qCounter').textContent=`Pregunta ${S.qCount} de 5`;
 }
 
 function setupKeys(){
@@ -413,16 +564,18 @@ async function sendAnswer(){
   const inp=document.getElementById('userInput');
   const text=inp.value.trim();
   if(!text||S.loading||S.done)return;
+  if(S.qCount>=5&&!S.done){showPaywall();return;}
   S.loading=true;document.getElementById('sendBtn').disabled=true;
   inp.value='';inp.style.height='auto';
   addMsg('user',text,false);S.history.push({role:'user',content:text});showTyping();
   try{
     const reply=await api(buildSystem(),S.history);
     hideTyping();S.history.push({role:'assistant',content:reply});
-    if(S.qCount<S.maxQ)S.qCount++;updateProgress();addMsg('ai',reply,true);
+    if(S.qCount<5)S.qCount++;
+    updateProgress();addMsg('ai',reply,true);
   }catch(e){hideTyping();addMsg('ai','Hubo un problema técnico. Repite tu respuesta.',false);}
   S.loading=false;document.getElementById('sendBtn').disabled=false;
-  if(!S.done)document.getElementById('userInput').focus();
+  if(!S.done)inp.focus();
 }
 
 async function generateResults(){
@@ -444,11 +597,10 @@ ENTREVISTA:\n${conv.substring(0,3000)}`;
 }
 
 function fallbackData(){
-  return{puntuacion:68,nivel:'Bueno',
-    resumen:'Has completado la entrevista satisfactoriamente. Demostraste interés por el puesto y buena comunicación general.',
-    puntosFuertes:['Comunicación clara y ordenada','Actitud positiva','Conocimiento del sector'],
-    mejorar:['Estructurar respuestas con el método STAR','Aportar ejemplos concretos con datos','Preparar preguntas para el entrevistador'],
-    consejo:'Practica con situaciones reales usando el método STAR: Situación, Tarea, Acción y Resultado.'};
+  return{puntuacion:68,nivel:'Bueno',resumen:'Has completado la entrevista satisfactoriamente.',
+    puntosFuertes:['Comunicación clara','Actitud positiva','Conocimiento del sector'],
+    mejorar:['Estructurar con método STAR','Aportar ejemplos con datos','Preparar preguntas para el entrevistador'],
+    consejo:'Practica con el método STAR: Situación, Tarea, Acción y Resultado.'};
 }
 
 function renderResults(d){
@@ -475,98 +627,14 @@ function renderResults(d){
     <div class="feedback-section" style="border-left:3px solid #2d6a4f">
       <h3>Consejo clave</h3><p>${d.consejo}</p>
     </div>
-    <div class="freemium-banner" style="margin-top:22px">
-      <p>Entrevistas ilimitadas y coaching avanzado con <strong>EntrIA Pro</strong></p>
-      <button class="btn-pro" onclick="alert('Proximamente. Escríbenos a hola@entria.es')">9 EUR/mes</button>
+    <div style="background:linear-gradient(135deg,#1a1814,#2d3a2e);color:white;padding:28px 32px;border-radius:14px;margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:20px">
+      <div>
+        <div style="font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:6px">¿Quieres seguir mejorando?</div>
+        <div style="font-size:14px;opacity:.75;line-height:1.6">Entrevistas ilimitadas + historial de progreso + PDF.<br>Un único pago de 4,99 EUR.</div>
+      </div>
+      <button onclick="showPaywall()" style="background:#52b788;color:#1a1814;border:none;padding:12px 22px;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;font-family:'Instrument Sans',sans-serif;flex-shrink:0">Conseguir Pro</button>
     </div>`;
   window.scrollTo(0,0);
-}
-
-function downloadPDF(){
-  const btn=document.getElementById('downloadBtn');
-  btn.disabled=true;btn.textContent='Generando PDF...';
-  try{
-    const{jsPDF}=window.jspdf;
-    const doc=new jsPDF({unit:'mm',format:'a4'});
-    const W=210,margin=20,cW=W-margin*2;let y=margin;
-    const checkPage=(n)=>{if(y+n>285){doc.addPage();y=margin;}};
-
-    doc.setFillColor(45,106,79);doc.rect(0,0,W,32,'F');
-    doc.setFontSize(22);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
-    doc.text('EntrIA',margin,20);
-    doc.setFontSize(10);doc.setFont('helvetica','normal');
-    doc.text('Informe de Simulacro de Entrevista',margin,27);y=44;
-
-    doc.setFillColor(237,233,224);doc.roundedRect(margin,y,cW,22,3,3,'F');
-    doc.setFontSize(9);doc.setFont('helvetica','bold');doc.setTextColor(90,86,80);
-    doc.text('CANDIDATO',margin+6,y+7);doc.text('PUESTO',margin+70,y+7);doc.text('FECHA',margin+145,y+7);
-    doc.setFont('helvetica','normal');doc.setTextColor(26,24,20);
-    doc.text(S.nombre,margin+6,y+15);doc.text(S.puesto.substring(0,30),margin+70,y+15);
-    doc.text(new Date().toLocaleDateString('es-ES'),margin+145,y+15);y+=30;
-
-    const d=S.evalData;
-    const sc=d.puntuacion>=75?[45,106,79]:d.puntuacion>=55?[183,98,27]:[192,57,43];
-    doc.setFillColor(...sc);doc.roundedRect(margin,y,cW,28,3,3,'F');
-    doc.setFontSize(26);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
-    doc.text(`${d.puntuacion}/100`,margin+8,y+19);
-    doc.setFontSize(13);doc.setFont('helvetica','normal');doc.text(d.nivel,margin+56,y+13);
-    doc.setFontSize(9);const rl=doc.splitTextToSize(d.resumen,cW-65);
-    doc.text(rl,margin+56,y+20);y+=36;
-
-    const section=(title,items,col)=>{
-      checkPage(16+items.length*9);
-      doc.setFontSize(12);doc.setFont('helvetica','bold');doc.setTextColor(...col);
-      doc.text(title,margin,y);y+=5;
-      doc.setDrawColor(...col);doc.line(margin,y,W-margin,y);y+=7;
-      items.forEach(p=>{
-        checkPage(10);
-        const ls=doc.splitTextToSize(p,cW-8);
-        doc.setFontSize(9.5);doc.setFont('helvetica','normal');doc.setTextColor(26,24,20);
-        doc.text(ls,margin+6,y);y+=ls.length*6+3;
-      });y+=4;
-    };
-    section('Puntos fuertes',d.puntosFuertes,[45,106,79]);
-    section('Areas de mejora',d.mejorar,[181,69,27]);
-
-    checkPage(26);
-    doc.setFillColor(216,243,220);doc.roundedRect(margin,y,cW,22,3,3,'F');
-    doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(45,106,79);
-    doc.text('Consejo clave',margin+6,y+8);
-    doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(26,24,20);
-    const cl=doc.splitTextToSize(d.consejo,cW-12);
-    doc.text(cl,margin+6,y+15);y+=26+cl.length*1.5;
-
-    doc.addPage();y=margin;
-    doc.setFillColor(26,24,20);doc.rect(0,0,W,16,'F');
-    doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
-    doc.text('Transcripcion completa de la entrevista',margin,11);y=24;
-
-    S.history.filter(m=>m.role!=='system').forEach(m=>{
-      const isAI=m.role==='assistant';
-      const speaker=isAI?'Entrevistador (EntrIA)':S.nombre;
-      const txt=m.content.replace('ENTREVISTA_COMPLETADA','').trim();
-      const col=isAI?[45,106,79]:[26,24,20];
-      const bgC=isAI?[240,248,244]:[248,246,242];
-      const ls=doc.splitTextToSize(txt,cW-10);
-      const bH=ls.length*5.5+14;checkPage(bH);
-      doc.setFillColor(...bgC);doc.roundedRect(margin,y,cW,bH,2,2,'F');
-      if(isAI){doc.setFillColor(45,106,79);doc.roundedRect(margin,y,3,bH,1,1,'F');}
-      doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.setTextColor(...col);
-      doc.text(speaker,margin+6,y+7);
-      doc.setFont('helvetica','normal');doc.setTextColor(26,24,20);doc.setFontSize(9);
-      doc.text(ls,margin+6,y+13);y+=bH+4;
-    });
-
-    const total=doc.internal.getNumberOfPages();
-    for(let p=1;p<=total;p++){
-      doc.setPage(p);doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.setTextColor(160,156,150);
-      doc.text(`EntrIA — Simulador de entrevistas con IA  |  Pagina ${p} de ${total}`,margin,292);
-      doc.text('entria.es',W-margin,292,{align:'right'});
-    }
-    doc.save(`EntrIA_${S.nombre}_${S.puesto.replace(/\s+/g,'_').substring(0,20)}.pdf`);
-  }catch(e){alert('Error generando el PDF. Inténtalo de nuevo.');}
-  btn.disabled=false;
-  btn.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> Descargar informe PDF';
 }
 
 async function api(sys,msgs){
