@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EntrIA — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:wght@0,400;0,500;0,600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f2ec;--ink:#1a1814;--ink2:#5a5650;--accent:#2d6a4f;--accent-light:#d8f3dc;--border:rgba(26,24,20,0.12)}
+body{font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.login-box{background:white;border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:400px;animation:fadeUp .4s ease}
+.login-box h1{font-family:'DM Serif Display',serif;font-size:26px;font-weight:400;margin-bottom:6px}
+.login-box p{color:var(--ink2);font-size:14px;margin-bottom:28px}
+.form-group{margin-bottom:16px}
+label{display:block;font-size:13px;font-weight:500;margin-bottom:5px}
+input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:11px 14px;font-family:'Instrument Sans',sans-serif;font-size:15px;color:var(--ink);outline:none;transition:border-color .15s}
+input:focus{border-color:var(--accent)}
+.btn{width:100%;background:var(--ink);color:white;border:none;padding:14px;border-radius:8px;font-family:'Instrument Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:background .15s;margin-top:8px}
+.btn:hover{background:var(--accent)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.error{color:#c0392b;font-size:13px;margin-top:8px;padding:8px 12px;background:#fde8d8;border-radius:6px;display:none}
+#panel{display:none;min-height:100vh}
+.panel-nav{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;background:var(--ink);color:white}
+.panel-logo{font-family:'DM Serif Display',serif;font-size:18px;color:white}
+.panel-logo span{color:#52b788}
+.btn-out{background:rgba(255,255,255,0.1);color:white;border:none;padding:7px 14px;border-radius:6px;font-size:13px;cursor:pointer;font-family:'Instrument Sans',sans-serif}
+.btn-out:hover{background:rgba(255,255,255,0.2)}
+.panel-body{max-width:900px;margin:0 auto;padding:40px 32px}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:36px}
+.stat-box{background:white;border:1px solid var(--border);border-radius:12px;padding:22px;text-align:center}
+.stat-n{font-family:'DM Serif Display',serif;font-size:36px;color:var(--accent)}
+.stat-l{font-size:13px;color:var(--ink2);margin-top:4px}
+.section-h{font-family:'DM Serif Display',serif;font-size:20px;font-weight:400;margin-bottom:14px}
+.add-box{background:white;border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:28px}
+.add-box h3{font-size:15px;font-weight:600;margin-bottom:16px}
+.add-row{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end}
+.add-row input{margin:0}
+.btn-add{background:var(--accent);color:white;border:none;padding:11px 20px;border-radius:8px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap}
+.btn-add:hover{background:#1f4f38}
+.btn-add:disabled{opacity:.5;cursor:not-allowed}
+.msg-box{font-size:13px;margin-top:10px;padding:8px 12px;border-radius:6px;display:none}
+.msg-box.ok{background:#d8f3dc;color:#2d6a4f}
+.msg-box.err{background:#fde8d8;color:#b5451b}
+.table{background:white;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.t-head{display:grid;grid-template-columns:2fr 2fr 1fr 1fr;padding:12px 20px;background:var(--bg);border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:var(--ink2);letter-spacing:.5px;text-transform:uppercase}
+.t-row{display:grid;grid-template-columns:2fr 2fr 1fr 1fr;padding:14px 20px;border-bottom:1px solid var(--border);align-items:center;animation:fadeUp .3s ease}
+.t-row:last-child{border-bottom:none}
+.t-row:hover{background:#fafaf8}
+.badge-pro{background:#d8f3dc;color:#2d6a4f;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.badge-free{background:var(--bg);color:var(--ink2);padding:3px 10px;border-radius:20px;font-size:12px}
+.btn-t{border:none;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Instrument Sans',sans-serif}
+.btn-t.pro{background:var(--accent);color:white}
+.btn-t.pro:hover{background:#1f4f38}
+.btn-t.free{background:#fde8d8;color:#b5451b}
+.btn-t.free:hover{background:#f5c6b8}
+.empty{padding:40px;text-align:center;color:var(--ink2);font-size:14px}
+.tloader{text-align:center;padding:32px;color:var(--ink2);font-size:14px;display:none}
+.sp{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px}
+</style>
+</head>
+<body>
+
+<div class="login-wrap" id="loginView">
+  <div class="login-box">
+    <h1>Panel EntrIA</h1>
+    <p>Acceso exclusivo para administradores</p>
+    <div class="form-group"><label>Email</label><input type="email" id="aEmail" placeholder="admin@entria.es"></div>
+    <div class="form-group"><label>Contraseña</label><input type="password" id="aPass" placeholder="••••••••"></div>
+    <div class="error" id="loginErr"></div>
+    <button class="btn" id="loginBtn" onclick="doLogin()">Entrar</button>
+  </div>
+</div>
+
+<div id="panel">
+  <div class="panel-nav">
+    <div class="panel-logo">Entr<span>IA</span> &nbsp;·&nbsp; <span style="font-size:13px;opacity:.6;font-family:'Instrument Sans',sans-serif;font-weight:400">Admin</span></div>
+    <button class="btn-out" onclick="doLogout()">Cerrar sesión</button>
+  </div>
+  <div class="panel-body">
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-n" id="sTotal">—</div><div class="stat-l">Usuarios totales</div></div>
+      <div class="stat-box"><div class="stat-n" id="sPro">—</div><div class="stat-l">Usuarios Pro</div></div>
+      <div class="stat-box"><div class="stat-n" id="sFree">—</div><div class="stat-l">Usuarios gratuitos</div></div>
+    </div>
+
+    <div class="section-h">Activar usuario Pro</div>
+    <div class="add-box">
+      <h3>Cuando alguien pague, créale aquí su acceso Pro</h3>
+      <div class="add-row">
+        <div><label>Email del cliente</label><input type="email" id="nEmail" placeholder="cliente@email.com"></div>
+        <div><label>Contraseña temporal</label><input type="text" id="nPass" placeholder="Ej: EntrIA2024!"></div>
+        <button class="btn-add" id="addBtn" onclick="addPro()">Activar Pro ✓</button>
+      </div>
+      <div class="msg-box" id="addMsg"></div>
+    </div>
+
+    <div class="section-h">Todos los usuarios</div>
+    <div class="table">
+      <div class="t-head"><div>Email</div><div>Registro</div><div>Estado</div><div>Acción</div></div>
+      <div class="tloader" id="tLoader"><span class="sp"></span>Cargando...</div>
+      <div id="tbody"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPA_URL='https://amfpvzbujxkvarqaojnj.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFtZnB2emJ1anhrdmFycWFvam5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNjA2ODQsImV4cCI6MjA5MzczNjY4NH0.7B7ggFkRkw6xyybHcNHTBdxi8uSw0votgS6_7jEfqMs';
+const supa=supabase.createClient(SUPA_URL,SUPA_KEY);
+// ⚠️ CAMBIA ESTO POR TU EMAIL DE ADMIN
+const ADMIN='jobwinspain@gmail.com';
+
+async function doLogin(){
+  const email=document.getElementById('aEmail').value.trim();
+  const pass=document.getElementById('aPass').value;
+  const err=document.getElementById('loginErr');
+  const btn=document.getElementById('loginBtn');
+  err.style.display='none';btn.disabled=true;btn.textContent='Entrando...';
+  const{data,error}=await supa.auth.signInWithPassword({email,password:pass});
+  if(error||data.user.email!==ADMIN){
+    if(!error)await supa.auth.signOut();
+    err.textContent='Credenciales incorrectas o sin permisos.';err.style.display='block';
+    btn.disabled=false;btn.textContent='Entrar';return;
+  }
+  document.getElementById('loginView').style.display='none';
+  document.getElementById('panel').style.display='block';
+  loadUsers();
+}
+
+async function doLogout(){await supa.auth.signOut();location.reload();}
+
+async function loadUsers(){
+  document.getElementById('tLoader').style.display='block';
+  document.getElementById('tbody').innerHTML='';
+  const{data}=await supa.from('profiles').select('*').order('created_at',{ascending:false});
+  document.getElementById('tLoader').style.display='none';
+  if(!data||!data.length){document.getElementById('tbody').innerHTML='<div class="empty">Sin usuarios aún.</div>';return;}
+  const pro=data.filter(p=>p.is_pro).length;
+  document.getElementById('sTotal').textContent=data.length;
+  document.getElementById('sPro').textContent=pro;
+  document.getElementById('sFree').textContent=data.length-pro;
+  document.getElementById('tbody').innerHTML=data.map(p=>{
+    const date=p.created_at?new Date(p.created_at).toLocaleDateString('es-ES'):'-';
+    return `<div class="t-row">
+      <div style="font-size:14px">${p.email||'—'}</div>
+      <div style="font-size:13px;color:var(--ink2)">${date}</div>
+      <div>${p.is_pro?'<span class="badge-pro">✓ Pro</span>':'<span class="badge-free">Gratuito</span>'}</div>
+      <div><button class="btn-t ${p.is_pro?'free':'pro'}" onclick="toggle('${p.id}',${p.is_pro})">${p.is_pro?'Quitar Pro':'Dar Pro'}</button></div>
+    </div>`;
+  }).join('');
+}
+
+async function toggle(id,isPro){
+  await supa.from('profiles').update({is_pro:!isPro}).eq('id',id);
+  loadUsers();
+}
+
+async function addPro(){
+  const email=document.getElementById('nEmail').value.trim();
+  const pass=document.getElementById('nPass').value.trim();
+  const msg=document.getElementById('addMsg');
+  const btn=document.getElementById('addBtn');
+  msg.style.display='none';
+  if(!email||!pass){msg.textContent='Rellena email y contraseña.';msg.className='msg-box err';msg.style.display='block';return;}
+  btn.disabled=true;btn.textContent='Creando...';
+  const{data,error}=await supa.auth.signUp({email,password:pass});
+  let uid=data?.user?.id;
+  if(!uid){
+    const{data:existing}=await supa.from('profiles').select('id').eq('email',email).single();
+    uid=existing?.id;
+  }
+  if(uid){
+    await supa.from('profiles').upsert({id:uid,email,is_pro:true});
+    msg.textContent=`✓ ${email} activado como Pro. Contraseña: ${pass}`;
+    msg.className='msg-box ok';msg.style.display='block';
+    document.getElementById('nEmail').value='';document.getElementById('nPass').value='';
+    loadUsers();
+  } else {
+    msg.textContent='No se pudo crear. Inténtalo de nuevo.';
+    msg.className='msg-box err';msg.style.display='block';
+  }
+  btn.disabled=false;btn.textContent='Activar Pro ✓';
+}
+</script>
+</body>
+</html>
