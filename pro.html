@@ -648,7 +648,7 @@ function loader(txt){document.getElementById('loaderText').textContent=txt;docum
 function hideLoader(){document.getElementById('loader').style.display='none';}
 
 async function api(sys,msgs){
-  const r=await fetch('https://api.anthropic.com/v1/messages',{
+  const r=await fetch('https://entria-proxy.jobwinspain.workers.dev/',{
     method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,system:sys,messages:msgs})
   });
