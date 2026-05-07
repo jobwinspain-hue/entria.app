@@ -19,25 +19,25 @@ html,body{height:100%;background:var(--bg);color:var(--ink);font-family:'Instrum
 .app{display:flex;height:100vh;overflow:hidden}
 
 /* SIDEBAR */
-.sidebar{width:260px;background:var(--ink);color:white;display:flex;flex-direction:column;flex-shrink:0}
-.sidebar-logo{display:flex;align-items:center;gap:10px;padding:22px 20px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.sidebar{width:260px;background:#f0ede6;color:var(--ink);display:flex;flex-direction:column;flex-shrink:0;border-right:1px solid rgba(26,24,20,0.1)}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:22px 20px;border-bottom:1px solid rgba(26,24,20,0.08)}
 .sidebar-logo-text{font-family:'Instrument Sans',sans-serif;font-size:18px;font-weight:600}
 .sidebar-logo-text span{color:var(--accent2)}
-.pro-chip{font-size:10px;background:linear-gradient(135deg,var(--gold),#e8c88a);color:#1a1814;padding:2px 8px;border-radius:10px;font-weight:700;margin-left:4px}
-.sidebar-section{padding:20px 16px 8px;font-size:11px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:1px;text-transform:uppercase}
-.sidebar-btn{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:8px;cursor:pointer;font-size:14px;color:rgba(255,255,255,0.75);transition:all .15s;margin:2px 8px;border:none;background:none;font-family:'Instrument Sans',sans-serif;width:calc(100% - 16px);text-align:left}
-.sidebar-btn:hover{background:rgba(255,255,255,0.08);color:white}
-.sidebar-btn.active{background:rgba(82,183,136,0.2);color:var(--accent2)}
+.pro-chip{font-size:9px;background:linear-gradient(135deg,var(--gold),#e8c88a);color:#1a1814;padding:1px 6px;border-radius:6px;font-weight:700;position:relative;top:-8px;margin-left:2px}
+.sidebar-section{padding:20px 16px 8px;font-size:11px;font-weight:600;color:rgba(26,24,20,0.35);letter-spacing:1px;text-transform:uppercase}
+.sidebar-btn{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--ink2);transition:all .15s;margin:2px 8px;border:none;background:none;font-family:'Instrument Sans',sans-serif;width:calc(100% - 16px);text-align:left}
+.sidebar-btn:hover{background:rgba(26,24,20,0.06);color:var(--ink)}
+.sidebar-btn.active{background:var(--accent-light);color:var(--accent)}
 .sidebar-btn svg{flex-shrink:0;opacity:.7}
 .sidebar-btn.active svg{opacity:1}
 .sidebar-spacer{flex:1}
-.sidebar-user{padding:16px;border-top:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px}
+.sidebar-user{padding:16px;border-top:1px solid rgba(26,24,20,0.08);display:flex;align-items:center;gap:10px}
 .user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#e8c88a);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#1a1814;flex-shrink:0}
 .user-info{flex:1;min-width:0}
-.user-email{font-size:12px;color:rgba(255,255,255,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.user-plan{font-size:11px;color:var(--accent2);font-weight:600}
-.btn-logout{background:none;border:none;color:rgba(255,255,255,0.35);cursor:pointer;padding:4px;transition:color .15s;font-size:16px}
-.btn-logout:hover{color:white}
+.user-email{font-size:12px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-plan{font-size:11px;color:var(--accent);font-weight:600}
+.btn-logout{background:none;border:none;color:var(--ink2);cursor:pointer;padding:4px;transition:color .15s;font-size:16px}
+.btn-logout:hover{color:var(--ink)}
 
 /* MAIN */
 .main{flex:1;overflow:hidden;display:flex;flex-direction:column}
@@ -146,7 +146,7 @@ textarea{resize:vertical;min-height:120px;line-height:1.6}
 #loader p{font-family:'Instrument Sans',sans-serif;font-weight:500;font-size:15px;color:var(--ink)}
 
 /* ── SIDEBAR ELEGANTE ── */
-.sidebar{background:linear-gradient(180deg,#1a1814 0%,#212118 100%);border-right:1px solid rgba(255,255,255,0.06)}
+.sidebar{background:#f0ede6;border-right:1px solid rgba(26,24,20,0.1)}
 .sidebar-logo{border-bottom:1px solid rgba(255,255,255,0.06);padding:24px 20px}
 .sidebar-btn{border-radius:10px;font-size:13.5px;padding:11px 16px}
 .sidebar-btn.active{background:rgba(82,183,136,0.15);color:#52b788;border:1px solid rgba(82,183,136,0.2)}
@@ -209,9 +209,9 @@ textarea{resize:vertical;min-height:120px;line-height:1.6}
     </button>
     <button class="sidebar-btn" id="btnNew" onclick="showView('setup')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-      Nueva entrevista
+      Nueva
     </button>
-    <button class="sidebar-btn" id="btnHistory" onclick="showView('dashboard')">
+    <button class="sidebar-btn" id="btnHistory" onclick="showView('history')">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
       Mi historial
     </button>
@@ -387,13 +387,24 @@ async function logout(){
 function showView(v){
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.sidebar-btn').forEach(el=>el.classList.remove('active'));
-  document.getElementById('view'+v.charAt(0).toUpperCase()+v.slice(1)).classList.add('active');
+  const viewId='view'+v.charAt(0).toUpperCase()+v.slice(1);
+  const el=document.getElementById(viewId);
+  if(el) el.classList.add('active');
   if(v==='dashboard'){document.getElementById('btnDash').classList.add('active');loadHistory();}
   else if(v==='setup'){document.getElementById('btnNew').classList.add('active');resetState();}
+  else if(v==='history'){document.getElementById('viewDashboard').classList.add('active');document.getElementById('btnHistory').classList.add('active');loadHistory();setTimeout(()=>{const h=document.getElementById('historyList');if(h)h.scrollIntoView({behavior:'smooth'});},400);}
+  else if(v==='interview'){}
+  else if(v==='results'){}
 }
 
 // HISTORY
 let historyData=[];
+
+function showHistoryView(){
+  // Reuse dashboard view but scroll to history
+  const histEl=document.getElementById('historyList');
+  if(histEl) histEl.scrollIntoView({behavior:'smooth'});
+}
 
 async function loadHistory(){
   if(!currentUser)return;
