@@ -69,23 +69,23 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:20px 4
 .pricing{padding:80px 48px;border-top:1px solid var(--border);text-align:center}
 .pricing h2{font-family:'DM Serif Display',serif;font-size:clamp(28px,4vw,44px);font-weight:400;margin-bottom:12px;letter-spacing:-0.3px}
 .pricing-sub{font-size:16px;color:var(--ink2);margin-bottom:48px}
-.pricing-cards{display:flex;gap:24px;justify-content:center;max-width:700px;margin:0 auto}
-.pricing-card{flex:1;background:white;border:1px solid var(--border);border-radius:16px;padding:32px;text-align:left}
-.pricing-card.featured{background:var(--ink);color:white;border-color:var(--ink)}
+.pricing-cards{display:flex;gap:16px;justify-content:center;max-width:600px;margin:0 auto}
+.pricing-card{flex:1;background:white;border:1px solid var(--border);border-radius:14px;padding:22px 24px;text-align:left}
+.pricing-card.featured{background:#f9fdf9;color:var(--ink);border:2px solid var(--accent);box-shadow:0 8px 32px rgba(45,106,79,0.12)}
 .pricing-card h3{font-family:'DM Serif Display',serif;font-size:22px;font-weight:400;margin-bottom:8px}
-.pricing-card.featured h3{color:white}
-.price{font-family:'DM Serif Display',serif;font-size:42px;color:var(--accent);line-height:1;margin:16px 0 4px}
+.pricing-card.featured h3{color:var(--ink);font-family:'DM Serif Display',serif;font-weight:400}
+.price{font-family:'DM Serif Display',serif;font-size:34px;color:var(--accent);line-height:1;margin:10px 0 3px}
 .pricing-card.featured .price{color:var(--accent2)}
-.price-note{font-size:13px;color:var(--ink2);margin-bottom:24px}
-.pricing-card.featured .price-note{color:rgba(255,255,255,0.5)}
-.pricing-features{list-style:none;margin-bottom:28px}
-.pricing-features li{font-size:14px;color:var(--ink2);padding:6px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
-.pricing-card.featured .pricing-features li{color:rgba(255,255,255,0.8);border-color:rgba(255,255,255,0.1)}
+.price-note{font-size:12px;color:var(--ink2);margin-bottom:16px}
+.pricing-card.featured .price-note{color:var(--ink2)}
+.pricing-features{list-style:none;margin-bottom:20px}
+.pricing-features li{font-size:13px;color:var(--ink2);padding:5px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px}
+.pricing-card.featured .pricing-features li{color:var(--ink2);border-color:var(--border)}
 .pricing-features li::before{content:'✓';color:var(--accent);font-weight:700;flex-shrink:0}
 .pricing-card.featured .pricing-features li::before{color:var(--accent2)}
 .pricing-features li.disabled{opacity:.4}
 .pricing-features li.disabled::before{content:'✕';color:var(--ink2)}
-.btn-pricing{width:100%;border:none;padding:14px;border-radius:8px;font-family:'Instrument Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-pricing{width:100%;border:none;padding:12px;border-radius:8px;font-family:'Instrument Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
 .btn-pricing.free{background:var(--bg2);color:var(--ink)}
 .btn-pricing.free:hover{background:var(--bg)}
 .btn-pricing.pro{background:var(--accent2);color:var(--ink)}
@@ -204,6 +204,34 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
 #loader{position:fixed;inset:0;background:rgba(245,242,236,0.92);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:300;gap:16px}
 .spinner{width:38px;height:38px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
 #loader p{font-family:'Instrument Sans',sans-serif;font-weight:500;color:var(--ink);font-size:16px}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  nav{padding:14px 20px}
+  .hero{padding:60px 24px 48px}
+  .hero h1{font-size:clamp(32px,8vw,48px);letter-spacing:-0.3px}
+  .hero p{font-size:15px}
+  .cta-group{flex-direction:column;width:100%}
+  .btn-primary,.btn-outline{width:100%;text-align:center}
+  .stats{gap:28px}
+  .stat-num{font-size:28px}
+  .how{padding:48px 24px}
+  .steps{grid-template-columns:1fr 1fr;gap:32px}
+  .steps::before{display:none}
+  .pricing{padding:48px 24px}
+  .pricing-cards{flex-direction:column}
+  .cta-section{padding:48px 24px}
+  #setup{padding:24px 20px}
+  .row-2{grid-template-columns:1fr}
+  .interview-header{padding:12px 16px}
+  .chat-area{padding:16px}
+  .input-footer{padding:12px 16px}
+  .msg{max-width:90%}
+  .progress-bar{width:80px}
+  #results{padding:24px 20px}
+  .score-card{flex-direction:column;text-align:center}
+  .results-actions{flex-direction:column}
+}
 </style>
 </head>
 <body>
