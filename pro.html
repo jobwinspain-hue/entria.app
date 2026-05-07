@@ -653,14 +653,24 @@ function downloadPDF(){
     doc.setFontSize(9);const rl=doc.splitTextToSize(d.resumen,cW-65);
     doc.text(rl,margin+56,y+20);y+=36;
     const section=(title,items,col)=>{
-      checkPage(16+items.length*9);
-      doc.setFontSize(12);doc.setFont('helvetica','bold');doc.setTextColor(...col);
-      doc.text(title,margin,y);y+=5;doc.setDrawColor(...col);doc.line(margin,y,W-margin,y);y+=7;
+      if(!items||items.length===0)return;
+      checkPage(20+items.length*12);
+      // Section title
+      doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(...col);
+      doc.text(title,margin,y);y+=6;
+      doc.setDrawColor(...col);doc.line(margin,y,W-margin,y);y+=8;
+      // Items with proper box sizing
       items.forEach(p=>{
-        checkPage(10);const ls=doc.splitTextToSize(p,cW-8);
+        const ls=doc.splitTextToSize(String(p),cW-16);
+        const bH=Math.max(10,ls.length*6+8);
+        checkPage(bH+4);
+        doc.setFillColor(248,252,249);
+        doc.roundedRect(margin,y,cW,bH,2,2,'F');
         doc.setFontSize(9.5);doc.setFont('helvetica','normal');doc.setTextColor(26,24,20);
-        doc.text(ls,margin+6,y);y+=ls.length*6+3;
-      });y+=4;
+        doc.text(ls,margin+8,y+6);
+        y+=bH+4;
+      });
+      y+=6;
     };
     section('Puntos fuertes',d.puntosFuertes||[],[45,106,79]);
     section('Areas de mejora',d.mejorar||[],[181,69,27]);
@@ -671,29 +681,11 @@ function downloadPDF(){
     doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(26,24,20);
     const cl=doc.splitTextToSize(d.consejo||'',cW-12);
     doc.text(cl,margin+6,y+15);y+=26+cl.length*1.5;
-    doc.addPage();y=margin;
-    doc.setFillColor(26,24,20);doc.rect(0,0,W,16,'F');
-    doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
-    doc.text('Transcripcion completa',margin,11);y=24;
-    S.history.filter(m=>m.role!=='system').forEach(m=>{
-      const isAI=m.role==='assistant';
-      const speaker=isAI?'Entrevistador (EntrIA)':S.nombre;
-      const txt=m.content.replace('ENTREVISTA_COMPLETADA','').trim();
-      const colT=isAI?[45,106,79]:[26,24,20];
-      const bgC=isAI?[240,248,244]:[248,246,242];
-      const ls=doc.splitTextToSize(txt,cW-10);
-      const bH=ls.length*5.5+14;checkPage(bH);
-      doc.setFillColor(...bgC);doc.roundedRect(margin,y,cW,bH,2,2,'F');
-      if(isAI){doc.setFillColor(45,106,79);doc.roundedRect(margin,y,3,bH,1,1,'F');}
-      doc.setFontSize(8.5);doc.setFont('helvetica','bold');doc.setTextColor(...colT);
-      doc.text(speaker,margin+6,y+7);
-      doc.setFont('helvetica','normal');doc.setTextColor(26,24,20);doc.setFontSize(9);
-      doc.text(ls,margin+6,y+13);y+=bH+4;
-    });
+
     const total=doc.internal.getNumberOfPages();
     for(let p=1;p<=total;p++){
       doc.setPage(p);doc.setFontSize(7.5);doc.setFont('helvetica','normal');doc.setTextColor(160,156,150);
-      doc.text(`EntrIA Pro | Pagina ${p} de ${total}`,margin,292);doc.text('entria.es',W-margin,292,{align:'right'});
+      doc.text(`EntrIA Pro | Pagina ${p} de ${total}`,margin,292);doc.text('entriajobs.com',W-margin,292,{align:'right'});
     }
     doc.save(`EntrIA_Pro_${S.nombre}_${S.puesto.replace(/\s+/g,'_').substring(0,20)}.pdf`);
   }catch(e){alert('Error generando PDF.');}
