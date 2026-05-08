@@ -673,7 +673,9 @@ function addMsg(role,text,checkDone=true){
   const av=role==='ai'?'E':S.nombre.charAt(0).toUpperCase();
   const cleanMd=clean.replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1');
   div.innerHTML=`<div class="msg-avatar">${av}</div><div class="msg-bubble">${cleanMd.replace(/\n/g,'<br>')}</div>`;
-  chat.appendChild(div);chat.scrollTop=chat.scrollHeight;
+  chat.appendChild(div);
+  // Solo hacer scroll si hay más de 1 mensaje (no en el primero)
+  if(chat.children.length > 1) chat.scrollTop=chat.scrollHeight;
   if(checkDone&&isDone){
     S.done=true;
     document.getElementById('inputFooter').style.display='none';
