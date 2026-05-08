@@ -703,7 +703,15 @@ function setupKeys(){
   const inp=document.getElementById('userInput');
   inp.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAnswer();}};
   inp.oninput=function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px';};
-  // Solo focus automático en desktop, no en móvil (evita scroll)
+  // En móvil: cuando abre teclado, scroll al último mensaje
+  inp.addEventListener('focus',()=>{
+    if(window.innerWidth <= 768){
+      setTimeout(()=>{
+        const chat=document.getElementById('chatArea');
+        chat.scrollTop=chat.scrollHeight;
+      },350);
+    }
+  });
   if(window.innerWidth > 768) inp.focus();
 }
 
