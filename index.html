@@ -232,6 +232,7 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
   .score-card{flex-direction:column;text-align:center}
   .results-actions{flex-direction:column}
 }
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 </style>
 </head>
 <body>
@@ -743,6 +744,16 @@ async function sendReset(){
   btn.disabled=false;btn.textContent='Enviar enlace';
 }
 
+
+// Cookie banner
+window.addEventListener('load', ()=>{
+  if(!localStorage.getItem('entria-cookies')){
+    document.getElementById('cookieBanner').style.display='flex';
+  }
+});
+function acceptCookies(){localStorage.setItem('entria-cookies','accepted');document.getElementById('cookieBanner').style.display='none';}
+function rejectCookies(){localStorage.setItem('entria-cookies','rejected');document.getElementById('cookieBanner').style.display='none';}
+
 // Detectar vuelta de pago exitoso
 window.addEventListener('load', async() => {
   const params = new URLSearchParams(window.location.search);
@@ -764,5 +775,35 @@ async function api(sys,msgs){
   const d=await r.json();return d?.content?.[0]?.text||'';
 }
 </script>
+
+<!-- FOOTER -->
+<footer style="background:var(--ink);color:white;padding:32px 48px;text-align:center;margin-top:0">
+  <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px">
+    <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="#2d6a4f"/>
+      <polyline points="5,17 10,22 18,11" stroke="rgba(255,255,255,0.35)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <polyline points="10,17 15,22 26,11" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </svg>
+    <span style="font-family:'Instrument Sans',sans-serif;font-size:16px;font-weight:600">Entr<span style="color:#52b788">IA</span></span>
+  </div>
+  <p style="font-size:13px;opacity:0.5;margin-bottom:16px">Simulador de entrevistas con IA adaptado al mercado laboral español</p>
+  <div style="display:flex;gap:24px;justify-content:center;flex-wrap:wrap">
+    <a href="/legal.html" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color .15s" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Aviso Legal</a>
+    <a href="/legal.html" onclick="localStorage.setItem('legalTab','privacidad')" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color .15s" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Política de Privacidad</a>
+    <a href="/legal.html" onclick="localStorage.setItem('legalTab','cookies')" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color .15s" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Cookies</a>
+    <a href="mailto:info@entriajobs.com" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color .15s" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">info@entriajobs.com</a>
+  </div>
+  <p style="font-size:12px;opacity:0.3;margin-top:20px">© 2026 EntrIA · José Antonio Fernández Montoya · Málaga, España</p>
+</footer>
+
+<!-- COOKIE BANNER -->
+<div id="cookieBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#1a1814;color:white;padding:16px 32px;z-index:500;animation:slideUp .3s ease;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
+  <p style="font-size:14px;opacity:.85;margin:0">Usamos cookies técnicas necesarias para el funcionamiento de EntrIA. No usamos cookies publicitarias. <a href="/legal.html" style="color:#52b788">Más info</a></p>
+  <div style="display:flex;gap:10px;flex-shrink:0">
+    <button onclick="acceptCookies()" style="background:#52b788;color:#1a1814;border:none;padding:9px 20px;border-radius:6px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer">Aceptar</button>
+    <button onclick="rejectCookies()" style="background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2);padding:9px 16px;border-radius:6px;font-family:'Instrument Sans',sans-serif;font-size:14px;cursor:pointer">Rechazar</button>
+  </div>
+</div>
+
 </body>
 </html>
