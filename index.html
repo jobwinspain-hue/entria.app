@@ -649,6 +649,7 @@ async function startInterview(){
     document.getElementById('reviewBanner').style.display='none';
     document.getElementById('inputFooter').style.display='flex';
     addMsg('ai',reply,false);updateProgress();setupKeys();
+    window.scrollTo(0,0);
   }catch(e){hideLoader();alert('Error de conexión. Inténtalo de nuevo.');}
 }
 
@@ -688,7 +689,8 @@ function showTyping(){
   const chat=document.getElementById('chatArea');
   const div=document.createElement('div');div.className='msg ai';div.id='typing';
   div.innerHTML='<div class="msg-avatar">E</div><div class="typing-indicator"><span></span><span></span><span></span></div>';
-  chat.appendChild(div);chat.scrollTop=chat.scrollHeight;
+  chat.appendChild(div);
+  if(chat.children.length > 1) chat.scrollTop=chat.scrollHeight;
 }
 function hideTyping(){const t=document.getElementById('typing');if(t)t.remove();}
 
