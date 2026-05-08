@@ -146,7 +146,7 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
 .start-btn:hover{background:var(--accent);transform:translateY(-1px)}
 
 /* INTERVIEW */
-#interview{display:none;flex-direction:column;height:100vh}
+#interview{display:none;flex-direction:column;height:100vh;height:100dvh}
 .interview-header{display:flex;align-items:center;justify-content:space-between;padding:14px 32px;border-bottom:1px solid var(--border);background:white;flex-shrink:0}
 .interview-logo{display:flex;align-items:center;gap:8px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:17px}
 .interview-logo span{color:var(--accent)}
@@ -155,7 +155,7 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
 .progress-bar{width:140px;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden}
 .progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease;width:0%}
 .free-badge{font-size:11px;background:#fef3e2;color:#b7621b;padding:3px 10px;border-radius:20px;font-weight:600}
-.chat-area{flex:1;overflow-y:auto;padding:32px;display:flex;flex-direction:column;gap:18px;scrollbar-width:thin}
+.chat-area{flex:1;overflow-y:auto;padding:32px;display:flex;flex-direction:column;gap:18px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
 .msg{display:flex;gap:12px;max-width:76%;animation:fadeUp .3s ease}
 .msg.ai{align-self:flex-start}
 .msg.user{align-self:flex-end;flex-direction:row-reverse}
@@ -169,7 +169,7 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
 .typing-indicator span{width:7px;height:7px;background:var(--ink2);border-radius:50%;animation:bounce 1.2s infinite ease-in-out}
 .typing-indicator span:nth-child(2){animation-delay:.2s}
 .typing-indicator span:nth-child(3){animation-delay:.4s}
-.input-footer{padding:18px 32px;border-top:1px solid var(--border);background:white;display:flex;gap:12px;align-items:flex-end;flex-shrink:0}
+.input-footer{padding:18px 32px;border-top:1px solid var(--border);background:white;display:flex;gap:12px;align-items:flex-end;flex-shrink:0;position:sticky;bottom:0}
 .input-footer textarea{flex:1;min-height:50px;max-height:120px;padding:13px 17px;border-radius:10px;font-size:15px;resize:none;background:white;border:1px solid var(--border);font-family:'Instrument Sans',sans-serif;color:var(--ink);outline:none}
 .input-footer textarea:focus{border-color:var(--accent)}
 .send-btn{height:50px;padding:0 22px;background:var(--ink);color:var(--bg);border:none;border-radius:10px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:background .15s;flex-shrink:0}
@@ -495,7 +495,7 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
 </div>
 
 <!-- INTERVIEW -->
-<div id="interview" style="display:none;flex-direction:column;height:100vh">
+<div id="interview" style="display:none;flex-direction:column;height:100vh;height:100dvh;overflow:hidden">
   <div class="interview-header">
     <div class="interview-logo">
       <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
