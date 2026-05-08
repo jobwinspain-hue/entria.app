@@ -278,6 +278,30 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
   </div>
 </div>
 
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="successModal" style="display:none">
+  <div class="modal" style="text-align:center;max-width:440px">
+    <div style="font-size:52px;margin-bottom:16px">🎉</div>
+    <h2 style="font-family:'DM Serif Display',serif;font-size:26px;font-weight:400;margin-bottom:12px">¡Pago completado!</h2>
+    <p style="color:var(--ink2);font-size:15px;line-height:1.7;margin-bottom:24px">
+      Te hemos enviado tus credenciales de acceso a <strong id="successEmail"></strong>.<br><br>
+      Revisa tu bandeja de entrada o la carpeta de <strong>correo no deseado</strong> si no lo ves en unos minutos.
+    </p>
+    <div style="background:var(--accent-light);border-radius:10px;padding:16px;margin-bottom:24px;text-align:left">
+      <div style="font-size:13px;color:var(--accent);font-weight:600;margin-bottom:6px">¿Qué hacer ahora?</div>
+      <div style="font-size:14px;color:var(--ink2);line-height:1.7">
+        1. Revisa tu email con las credenciales<br>
+        2. Vuelve a esta página<br>
+        3. Pulsa <strong>"Iniciar sesión"</strong> con tu email y contraseña
+      </div>
+    </div>
+    <button class="modal-btn" onclick="document.getElementById('successModal').style.display='none';openModal()">
+      Iniciar sesión →
+    </button>
+  </div>
+</div>
+
 <!-- LANDING -->
 <div id="landing">
   <nav>
@@ -672,6 +696,19 @@ function renderResults(d){
     </div>`;
   window.scrollTo(0,0);
 }
+
+
+// Detectar vuelta de pago exitoso
+window.addEventListener('load', async() => {
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('pago') === 'ok') {
+    const email = params.get('email') || '';
+    document.getElementById('successEmail').textContent = email || 'tu email';
+    document.getElementById('successModal').style.display = 'flex';
+    // Limpiar URL
+    window.history.replaceState({}, '', '/');
+  }
+});
 
 async function api(sys,msgs){
   const r=await fetch('https://entria-proxy.jobwinspain.workers.dev/',{
