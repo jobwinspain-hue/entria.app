@@ -596,8 +596,8 @@ async function showPaywall(fromInterview=false){
         .map(m=>`${m.role==='user'?S.nombre:'Entrevistador'}: ${m.content}`)
         .join('\n\n');
       const prompt=`Analiza esta entrevista PARCIAL para "${S.puesto}" y responde SOLO con JSON sin backticks:
-{"puntuacion":65,"puntosFuertes":["p1","p2","p3"],"mejorar":["m1","m2","m3"]}
-IMPORTANTE: La puntuación máxima debe ser 74 — es una entrevista incompleta.
+{"puntuacion":65,"puntosFuertes":["p1","p2"],"mejorar":["m1","m2"]}
+IMPORTANTE: La puntuación máxima debe ser 74. Devuelve SOLO 2 puntos fuertes y 2 áreas de mejora, muy cortos (máximo 6 palabras cada uno).
 ENTREVISTA PARCIAL:\n${conv.substring(0,2000)}`;
       const r=await api('Eres evaluador experto en RRHH. Responde SOLO con JSON válido.',
         [{role:'user',content:prompt}]);
