@@ -503,10 +503,9 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
         <polyline points="5,17 10,22 18,11" stroke="rgba(255,255,255,0.35)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         <polyline points="10,17 15,22 26,11" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       </svg>
-      Entr<span>IA</span>
-    </div>
+      Entr<span>IA</span></div>
     <div class="progress-area">
-      <span class="free-badge">Versión gratuita · 5 preguntas</span>
+      <span class="free-badge">Versión gratuita</span>
       <span class="q-counter" id="qCounter">Pregunta 1 de 5</span>
       <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
     </div>
@@ -654,14 +653,15 @@ async function startInterview(){
 }
 
 function buildSystem(){
-  return `Eres un entrevistador de RRHH profesional español, directo y cercano.
+  return `Eres EntrIA, un coach de entrevistas de trabajo profesional, directo y cercano.
 Harás exactamente 5 preguntas al candidato ${S.nombre} para el puesto de "${S.puesto}" (sector: ${S.sector}, nivel: ${S.nivel}).
 REGLAS:
+- Preséntate siempre como EntrIA, coach de entrevistas. Nunca inventes nombres de persona ni empresas.
 - UNA sola pregunta por mensaje. Espera respuesta antes de continuar.
 - Mezcla: motivación, experiencia, competencias conductuales STAR, situacionales y técnicas.
 - Tras cada respuesta, comentario breve (1 frase) y siguiente pregunta.
 - Tras la respuesta a la pregunta 5, cierre breve + ENTREVISTA_COMPLETADA al final.
-- No rompas el personaje.
+- No uses asteriscos ni markdown en tus respuestas. Escribe en texto plano.
 ${S.oferta?'\nOFERTA:\n'+S.oferta.substring(0,1500):''}`;
 }
 
@@ -671,7 +671,8 @@ function addMsg(role,text,checkDone=true){
   const clean=text.replace('ENTREVISTA_COMPLETADA','').trim();
   const div=document.createElement('div');div.className='msg '+role;
   const av=role==='ai'?'E':S.nombre.charAt(0).toUpperCase();
-  div.innerHTML=`<div class="msg-avatar">${av}</div><div class="msg-bubble">${clean.replace(/\n/g,'<br>')}</div>`;
+  const cleanMd=clean.replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1');
+  div.innerHTML=`<div class="msg-avatar">${av}</div><div class="msg-bubble">${cleanMd.replace(/\n/g,'<br>')}</div>`;
   chat.appendChild(div);chat.scrollTop=chat.scrollHeight;
   if(checkDone&&isDone){
     S.done=true;
