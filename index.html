@@ -519,7 +519,18 @@ const supa=supabase.createClient(SUPA_URL,SUPA_KEY);
 let S={puesto:'',sector:'',nivel:'',oferta:'',nombre:'',history:[],qCount:0,maxQ:5,loading:false,done:false,evalData:null};
 
 // Check if already logged in as Pro → redirect
+// But first check if this is a password recovery flow
+supa.auth.onAuthStateChange((event, session) => {
+  if(event === 'PASSWORD_RECOVERY'){
+    // Redirigir a pro.html manteniendo el token de recuperación
+    window.location.href='https://entriajobs.com/pro.html' + window.location.hash;
+  }
+});
+
 window.addEventListener('load',async()=>{
+  // Si es un flujo de recuperación, no redirigir todavía
+  if(window.location.hash.includes('type=recovery')) return;
+  
   const{data:{session}}=await supa.auth.getSession();
   if(session?.user){
     const{data}=await supa.from('profiles').select('is_pro').eq('id',session.user.id).single();
