@@ -254,6 +254,7 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
     </div>
     <div class="modal-error" id="authError"></div>
     <button class="modal-btn" id="authBtn" onclick="handleLogin()">Iniciar sesión</button>
+    <p style="text-align:center;margin-top:8px"><a onclick="showResetModal()" style="font-size:13px;color:var(--ink2);cursor:pointer;text-decoration:underline">¿Olvidaste tu contraseña?</a></p>
     <p class="modal-switch">¿No tienes cuenta? <a onclick="closeModal();showPaywall()">Hazte Pro →</a></p>
   </div>
 </div>
@@ -278,6 +279,23 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
   </div>
 </div>
 
+
+
+<!-- RESET PASSWORD MODAL -->
+<div class="modal-overlay" id="resetModal" style="display:none">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('resetModal').style.display='none'">✕</button>
+    <h2>Recuperar contraseña</h2>
+    <p style="color:var(--ink2);font-size:14px;margin-bottom:24px;line-height:1.6">Introduce tu email y te enviaremos un enlace para restablecer tu contraseña.</p>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="resetEmail" placeholder="tu@email.com">
+    </div>
+    <div class="modal-error" id="resetMsg"></div>
+    <button class="modal-btn" id="resetBtn" onclick="sendReset()">Enviar enlace</button>
+    <p style="text-align:center;margin-top:12px"><a onclick="document.getElementById('resetModal').style.display='none';openModal()" style="font-size:13px;color:var(--ink2);cursor:pointer;text-decoration:underline">← Volver al login</a></p>
+  </div>
+</div>
 
 <!-- SUCCESS MODAL -->
 <div class="modal-overlay" id="successModal" style="display:none">
@@ -697,6 +715,33 @@ function renderResults(d){
   window.scrollTo(0,0);
 }
 
+
+
+function showResetModal(){
+  document.getElementById('authModal').style.display='none';
+  document.getElementById('resetModal').style.display='flex';
+  document.getElementById('resetMsg').style.display='none';
+}
+
+async function sendReset(){
+  const email=document.getElementById('resetEmail').value.trim();
+  const msg=document.getElementById('resetMsg');
+  const btn=document.getElementById('resetBtn');
+  if(!email){msg.textContent='Introduce tu email.';msg.style.display='block';return;}
+  btn.disabled=true;btn.textContent='Enviando...';
+  const{error}=await supa.auth.resetPasswordForEmail(email,{
+    redirectTo:'https://entriajobs.com/pro.html'
+  });
+  if(error){
+    msg.textContent='Error al enviar. Comprueba el email.';
+    msg.style.background='#fde8d8';msg.style.color='#b5451b';
+  } else {
+    msg.textContent='✓ Email enviado. Revisa tu bandeja de entrada y la carpeta de no deseados.';
+    msg.style.background='#d8f3dc';msg.style.color='#2d6a4f';
+  }
+  msg.style.display='block';
+  btn.disabled=false;btn.textContent='Enviar enlace';
+}
 
 // Detectar vuelta de pago exitoso
 window.addEventListener('load', async() => {
