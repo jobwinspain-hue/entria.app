@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aviso Legal, Privacidad y Cookies — EntrIA</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f2ec;--ink:#1a1814;--ink2:#5a5650;--accent:#2d6a4f;--border:rgba(26,24,20,0.12)}
+body{font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--ink);line-height:1.7}
+nav{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:50}
+.logo{font-family:'Instrument Sans',sans-serif;font-size:20px;font-weight:600;color:var(--ink);text-decoration:none}
+.logo span{color:var(--accent)}
+.nav-back{font-size:14px;color:var(--ink2);text-decoration:none;transition:color .15s}
+.nav-back:hover{color:var(--ink)}
+.container{max-width:760px;margin:0 auto;padding:60px 48px}
+.tabs{display:flex;gap:8px;margin-bottom:48px;border-bottom:1px solid var(--border);padding-bottom:0}
+.tab{padding:10px 20px;border-radius:8px 8px 0 0;font-size:14px;font-weight:500;cursor:pointer;color:var(--ink2);border:1px solid transparent;border-bottom:none;margin-bottom:-1px;transition:all .15s;background:none}
+.tab.active{background:white;color:var(--ink);border-color:var(--border);border-bottom-color:white}
+.tab:hover:not(.active){color:var(--ink)}
+.section{display:none}
+.section.active{display:block}
+h1{font-family:'DM Serif Display',serif;font-size:36px;font-weight:400;margin-bottom:8px;letter-spacing:-0.3px}
+.updated{font-size:13px;color:var(--ink2);margin-bottom:40px}
+h2{font-family:'DM Serif Display',serif;font-size:22px;font-weight:400;margin:36px 0 12px;color:var(--ink)}
+h3{font-size:15px;font-weight:600;margin:24px 0 8px}
+p{color:var(--ink2);margin-bottom:14px;font-size:15px}
+ul,ol{color:var(--ink2);padding-left:20px;margin-bottom:14px;font-size:15px}
+li{margin-bottom:6px}
+a{color:var(--accent)}
+.highlight{background:var(--accent-light, #d8f3dc);border-left:3px solid var(--accent);padding:16px 20px;border-radius:0 8px 8px 0;margin:20px 0}
+.highlight p{margin:0;color:var(--ink)}
+/* Cookie banner */
+#cookieBanner{position:fixed;bottom:0;left:0;right:0;background:var(--ink);color:white;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;z-index:100;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+#cookieBanner p{font-size:14px;opacity:.85;margin:0}
+#cookieBanner a{color:#52b788}
+.cookie-btns{display:flex;gap:10px;flex-shrink:0}
+.btn-accept{background:#52b788;color:#1a1814;border:none;padding:9px 20px;border-radius:6px;font-family:'Instrument Sans',sans-serif;font-weight:600;font-size:14px;cursor:pointer}
+.btn-reject{background:rgba(255,255,255,0.1);color:white;border:1px solid rgba(255,255,255,0.2);padding:9px 16px;border-radius:6px;font-family:'Instrument Sans',sans-serif;font-size:14px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="https://entriajobs.com" class="logo">Entr<span>IA</span></a>
+  <a href="https://entriajobs.com" class="nav-back">← Volver</a>
+</nav>
+
+<!-- Cookie Banner -->
+<div id="cookieBanner" style="display:none">
+  <p>Usamos cookies propias para el funcionamiento de la plataforma. No usamos cookies de terceros ni publicidad. <a href="#cookies" onclick="showTab('cookies')">Más info</a></p>
+  <div class="cookie-btns">
+    <button class="btn-accept" onclick="acceptCookies()">Aceptar</button>
+    <button class="btn-reject" onclick="rejectCookies()">Rechazar</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('legal')">Aviso Legal</div>
+    <div class="tab" onclick="showTab('privacidad')">Privacidad</div>
+    <div class="tab" id="tab-cookies" onclick="showTab('cookies')">Cookies</div>
+  </div>
+
+  <!-- AVISO LEGAL -->
+  <div class="section active" id="legal">
+    <h1>Aviso Legal</h1>
+    <p class="updated">Última actualización: mayo de 2026</p>
+
+    <div class="highlight">
+      <p>En cumplimiento con el artículo 10 de la Ley 34/2002, de Servicios de la Sociedad de la Información y Comercio Electrónico (LSSI-CE), se informa de los datos identificativos del titular de este sitio web.</p>
+    </div>
+
+    <h2>1. Datos del titular</h2>
+    <p><strong>Titular:</strong> José Antonio Fernández Montoya</p>
+    <p><strong>Correo electrónico:</strong> info@entriajobs.com</p>
+    <p><strong>Domicilio:</strong> Málaga, España</p>
+    <p><strong>Sitio web:</strong> https://entriajobs.com</p>
+
+    <h2>2. Objeto y ámbito de aplicación</h2>
+    <p>El presente Aviso Legal regula el acceso y uso del sitio web <strong>entriajobs.com</strong> y del servicio <strong>EntrIA</strong>, un simulador de entrevistas de trabajo basado en inteligencia artificial dirigido al mercado laboral español.</p>
+
+    <h2>3. Propiedad intelectual</h2>
+    <p>Todos los contenidos del sitio web — incluyendo textos, gráficos, logotipos, imágenes, código fuente y diseño — son propiedad de José Antonio Fernández Montoya o se dispone de licencia para su uso, y están protegidos por la legislación española e internacional sobre propiedad intelectual.</p>
+    <p>Queda prohibida su reproducción, distribución o modificación sin autorización expresa por escrito del titular.</p>
+
+    <h2>4. Condiciones de uso del servicio</h2>
+    <p>El usuario se compromete a:</p>
+    <ul>
+      <li>Usar el servicio de forma lícita y conforme a la normativa vigente</li>
+      <li>No utilizar el servicio para fines fraudulentos o que perjudiquen a terceros</li>
+      <li>No compartir sus credenciales de acceso con terceros</li>
+      <li>Ser mayor de 18 años para acceder a la versión de pago</li>
+    </ul>
+
+    <h2>5. Condiciones de la versión Pro</h2>
+    <p>La versión Pro de EntrIA implica un <strong>pago único de 4,99 EUR</strong> que otorga acceso ilimitado al servicio de forma indefinida. No existen pagos recurrentes ni suscripciones.</p>
+    <p>Dado el carácter digital e inmediato del servicio, el usuario reconoce que, una vez activado el acceso Pro, <strong>no procede el derecho de desistimiento</strong> regulado en el Real Decreto Legislativo 1/2007, conforme a su artículo 103.a).</p>
+
+    <h2>6. Limitación de responsabilidad</h2>
+    <p>EntrIA es una herramienta de práctica y preparación para entrevistas. El titular no garantiza resultados laborales específicos derivados del uso del servicio. Las respuestas generadas por inteligencia artificial tienen carácter orientativo y no constituyen asesoramiento profesional de recursos humanos.</p>
+
+    <h2>7. Legislación aplicable</h2>
+    <p>Este Aviso Legal se rige por la legislación española. Para cualquier controversia, las partes se someten a los juzgados y tribunales de Málaga, España.</p>
+  </div>
+
+  <!-- PRIVACIDAD -->
+  <div class="section" id="privacidad">
+    <h1>Política de Privacidad</h1>
+    <p class="updated">Última actualización: mayo de 2026</p>
+
+    <div class="highlight">
+      <p>En EntrIA respetamos tu privacidad. Esta política explica qué datos recogemos, para qué los usamos y cómo los protegemos, en cumplimiento del Reglamento General de Protección de Datos (RGPD) y la Ley Orgánica 3/2018 (LOPDGDD).</p>
+    </div>
+
+    <h2>1. Responsable del tratamiento</h2>
+    <p><strong>Identidad:</strong> José Antonio Fernández Montoya</p>
+    <p><strong>Correo de contacto:</strong> info@entriajobs.com</p>
+
+    <h2>2. Datos que recogemos</h2>
+    <h3>Usuarios gratuitos</h3>
+    <p>No recogemos ningún dato personal. Las sesiones de práctica son anónimas y no se almacenan.</p>
+
+    <h3>Usuarios Pro</h3>
+    <ul>
+      <li><strong>Email y contraseña</strong> — para gestionar tu cuenta de acceso</li>
+      <li><strong>Historial de entrevistas</strong> — puntuaciones, puesto practicado y feedback (almacenado en tu cuenta)</li>
+      <li><strong>Datos de pago</strong> — gestionados íntegramente por Stripe. EntrIA no almacena datos de tarjetas de crédito</li>
+    </ul>
+
+    <h2>3. Finalidad del tratamiento</h2>
+    <ul>
+      <li>Gestionar el acceso a la plataforma y autenticar usuarios</li>
+      <li>Proporcionar el servicio de simulación de entrevistas</li>
+      <li>Guardar el historial de progreso del usuario</li>
+      <li>Procesar el pago y enviar las credenciales de acceso</li>
+      <li>Responder consultas enviadas a info@entriajobs.com</li>
+    </ul>
+
+    <h2>4. Base legal</h2>
+    <p>El tratamiento se basa en la <strong>ejecución del contrato</strong> (acceso al servicio) y el <strong>consentimiento</strong> del usuario al registrarse.</p>
+
+    <h2>5. Terceros que acceden a tus datos</h2>
+    <ul>
+      <li><strong>Supabase</strong> — plataforma de base de datos y autenticación (servidores en la UE)</li>
+      <li><strong>Stripe</strong> — procesador de pagos (cumple con PCI DSS)</li>
+      <li><strong>Resend</strong> — servicio de envío de emails transaccionales</li>
+      <li><strong>Anthropic</strong> — proveedor de IA para generar las preguntas de entrevista. Las conversaciones no se almacenan de forma identificable</li>
+    </ul>
+    <p>Ninguno de estos terceros vende tus datos ni los usa para publicidad.</p>
+
+    <h2>6. Conservación de datos</h2>
+    <p>Los datos se conservan mientras mantengas tu cuenta activa. Puedes solicitar la eliminación en cualquier momento escribiendo a info@entriajobs.com.</p>
+
+    <h2>7. Tus derechos</h2>
+    <p>Como usuario tienes derecho a:</p>
+    <ul>
+      <li><strong>Acceso</strong> — conocer qué datos tenemos sobre ti</li>
+      <li><strong>Rectificación</strong> — corregir datos incorrectos</li>
+      <li><strong>Supresión</strong> — eliminar tu cuenta y datos</li>
+      <li><strong>Portabilidad</strong> — recibir tus datos en formato exportable</li>
+      <li><strong>Oposición</strong> — oponerte a determinados tratamientos</li>
+    </ul>
+    <p>Para ejercer cualquier derecho, escribe a <a href="mailto:info@entriajobs.com">info@entriajobs.com</a>. También puedes reclamar ante la <strong>Agencia Española de Protección de Datos</strong> (aepd.es).</p>
+
+    <h2>8. Seguridad</h2>
+    <p>Aplicamos medidas técnicas y organizativas para proteger tus datos: cifrado HTTPS, autenticación segura mediante Supabase y acceso restringido a la base de datos.</p>
+  </div>
+
+  <!-- COOKIES -->
+  <div class="section" id="cookies">
+    <h1>Política de Cookies</h1>
+    <p class="updated">Última actualización: mayo de 2026</p>
+
+    <div class="highlight">
+      <p>EntrIA utiliza únicamente cookies técnicas necesarias para el funcionamiento de la plataforma. No usamos cookies publicitarias ni de seguimiento de terceros.</p>
+    </div>
+
+    <h2>¿Qué son las cookies?</h2>
+    <p>Las cookies son pequeños archivos de texto que se almacenan en tu navegador cuando visitas un sitio web. Permiten que el sitio recuerde tus preferencias y mantenga tu sesión iniciada.</p>
+
+    <h2>Cookies que usamos</h2>
+    <table style="width:100%;border-collapse:collapse;margin:16px 0">
+      <thead>
+        <tr style="background:white;border-bottom:2px solid var(--border)">
+          <th style="text-align:left;padding:10px 14px;font-size:13px;color:var(--ink2)">Cookie</th>
+          <th style="text-align:left;padding:10px 14px;font-size:13px;color:var(--ink2)">Tipo</th>
+          <th style="text-align:left;padding:10px 14px;font-size:13px;color:var(--ink2)">Finalidad</th>
+          <th style="text-align:left;padding:10px 14px;font-size:13px;color:var(--ink2)">Duración</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:10px 14px;font-size:14px">sb-session</td>
+          <td style="padding:10px 14px;font-size:14px;color:var(--ink2)">Técnica</td>
+          <td style="padding:10px 14px;font-size:14px;color:var(--ink2)">Mantener la sesión iniciada</td>
+          <td style="padding:10px 14px;font-size:14px;color:var(--ink2)">Sesión</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:10px 14px;font-size:14px">entria-cookies</td>
+          <td style="padding:10px 14px;font-size:14px;color:var(--ink2)">Técnica</td>
+          <td style="padding:10px 14px;font-size:14px;color:var(--ink2)">Recordar preferencias de cookies</td>
+          <td style="padding:10px 14px;font-size:14px;color:var(--ink2)">1 año</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Cómo gestionar las cookies</h2>
+    <p>Puedes configurar tu navegador para bloquear o eliminar cookies. Ten en cuenta que si bloqueas las cookies técnicas, es posible que no puedas iniciar sesión en EntrIA.</p>
+    <ul>
+      <li><a href="https://support.google.com/chrome/answer/95647" target="_blank">Chrome</a></li>
+      <li><a href="https://support.mozilla.org/es/kb/habilitar-y-deshabilitar-cookies-sitios-web-rastrear-preferencias" target="_blank">Firefox</a></li>
+      <li><a href="https://support.apple.com/es-es/guide/safari/sfri11471/mac" target="_blank">Safari</a></li>
+    </ul>
+
+    <h2>Contacto</h2>
+    <p>Para cualquier consulta sobre nuestra política de cookies, escríbenos a <a href="mailto:info@entriajobs.com">info@entriajobs.com</a>.</p>
+  </div>
+</div>
+
+<script>
+function showTab(tab){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>{
+    if(t.getAttribute('onclick').includes(tab)) t.classList.add('active');
+  });
+}
+
+// Cookie banner
+window.addEventListener('load',()=>{
+  if(!localStorage.getItem('entria-cookies')){
+    document.getElementById('cookieBanner').style.display='flex';
+  }
+});
+
+function acceptCookies(){
+  localStorage.setItem('entria-cookies','accepted');
+  document.getElementById('cookieBanner').style.display='none';
+}
+
+function rejectCookies(){
+  localStorage.setItem('entria-cookies','rejected');
+  document.getElementById('cookieBanner').style.display='none';
+}
+</script>
+</body>
+</html>
