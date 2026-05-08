@@ -703,7 +703,8 @@ function setupKeys(){
   const inp=document.getElementById('userInput');
   inp.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAnswer();}};
   inp.oninput=function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px';};
-  inp.focus();
+  // Solo focus automático en desktop, no en móvil (evita scroll)
+  if(window.innerWidth > 768) inp.focus();
 }
 
 async function sendAnswer(){
@@ -721,7 +722,7 @@ async function sendAnswer(){
     updateProgress();addMsg('ai',reply,true);
   }catch(e){hideTyping();addMsg('ai','Hubo un problema técnico. Repite tu respuesta.',false);}
   S.loading=false;document.getElementById('sendBtn').disabled=false;
-  if(!S.done)inp.focus();
+  if(!S.done && window.innerWidth > 768) inp.focus();
 }
 
 async function generateResults(){
