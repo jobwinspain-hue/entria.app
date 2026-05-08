@@ -262,10 +262,28 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
 
 <!-- PAYWALL -->
 <div class="paywall-overlay" id="paywallModal">
-  <div class="paywall">
+  <div class="paywall" style="max-height:90vh;overflow-y:auto">
+
+    <!-- Bloque dinámico con resultados parciales -->
+    <div id="paywallResults" style="display:none;background:#f5f2ec;border-radius:12px;padding:20px;margin-bottom:20px;text-align:left">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:0.5px">Tu progreso hasta ahora</div>
+        <div id="paywallScore" style="font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;color:#2d6a4f"></div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:12px;font-weight:600;color:#2d6a4f;margin-bottom:6px">✓ Puntos fuertes</div>
+        <ul id="paywallFuertes" style="font-size:13px;color:var(--ink2);padding-left:16px;line-height:1.8"></ul>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:#b5451b;margin-bottom:6px">↑ Áreas de mejora</div>
+        <ul id="paywallMejora" style="font-size:13px;color:var(--ink2);padding-left:16px;line-height:1.8"></ul>
+      </div>
+    </div>
+
+    <!-- CTA -->
     <div class="paywall-icon">🚀</div>
     <h2>Consigue EntrIA Pro</h2>
-    <p>Practica sin límites hasta conseguir el trabajo que mereces.</p>
+    <p id="paywallDesc">Para seguir con tu entrevista, descubrir tu evolución y recibir asesoramiento con coach personalizado, continúa con la versión Pro.</p>
     <div class="paywall-price">4,99 EUR</div>
     <div class="paywall-price-sub">pago único — tuyo para siempre</div>
     <ul class="paywall-features">
@@ -275,7 +293,9 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
       <li>Preguntas adaptadas a la oferta real</li>
       <li>Acceso prioritario a nuevas funciones</li>
     </ul>
-    <div style="margin-bottom:16px;text-align:left"><label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">Tu email</label><input type="email" id="paywallEmail" placeholder="tu@email.com" style="width:100%;background:white;border:1px solid rgba(26,24,20,0.12);border-radius:8px;padding:11px 14px;font-family:Instrument Sans,sans-serif;font-size:15px;color:#1a1814;outline:none"></div><div style="font-size:12px;color:#5a5650;margin-bottom:16px;text-align:left">Usa el mismo email con el que accederas a EntrIA Pro</div><button class="paywall-btn" id="paywallBtn" onclick="startCheckout()">Pagar 4,99 EUR con tarjeta →</button>
+    <div style="margin-bottom:16px;text-align:left"><label style="display:block;font-size:13px;font-weight:500;margin-bottom:6px">Tu email</label><input type="email" id="paywallEmail" placeholder="tu@email.com" style="width:100%;background:white;border:1px solid rgba(26,24,20,0.12);border-radius:8px;padding:11px 14px;font-family:Instrument Sans,sans-serif;font-size:15px;color:#1a1814;outline:none"></div>
+    <div style="font-size:12px;color:#5a5650;margin-bottom:16px;text-align:left">Usa el mismo email con el que accederás a EntrIA Pro</div>
+    <button class="paywall-btn" id="paywallBtn" onclick="startCheckout()">Pagar 4,99 EUR con tarjeta →</button>
     <button class="paywall-back" onclick="closePaywall()">Seguir con la versión gratuita</button>
   </div>
 </div>
@@ -566,7 +586,36 @@ async function handleLogin(){
 }
 
 // PAYWALL
-function showPaywall(){document.getElementById('paywallModal').style.display='flex';}
+async function showPaywall(fromInterview=false){
+  // Si viene de la entrevista, intentar generar evaluación parcial
+  if(fromInterview && S.history.length >= 4){
+    try{
+      const conv=S.history.filter(m=>m.role!=='system')
+        .map(m=>`${m.role==='user'?S.nombre:'Entrevistador'}: ${m.content}`)
+        .join('\n\n');
+      const prompt=`Analiza esta entrevista PARCIAL para "${S.puesto}" y responde SOLO con JSON sin backticks:
+{"puntuacion":65,"puntosFuertes":["p1","p2","p3"],"mejorar":["m1","m2","m3"]}
+IMPORTANTE: La puntuación máxima debe ser 74 — es una entrevista incompleta.
+ENTREVISTA PARCIAL:\n${conv.substring(0,2000)}`;
+      const r=await api('Eres evaluador experto en RRHH. Responde SOLO con JSON válido.',
+        [{role:'user',content:prompt}]);
+      const data=JSON.parse(r.replace(/```json|```/g,'').trim());
+      
+      // Mostrar resultados parciales
+      document.getElementById('paywallResults').style.display='block';
+      document.getElementById('paywallScore').textContent=data.puntuacion+'/100';
+      document.getElementById('paywallFuertes').innerHTML=
+        (data.puntosFuertes||[]).map(p=>`<li>${p}</li>`).join('');
+      document.getElementById('paywallMejora').innerHTML=
+        (data.mejorar||[]).map(p=>`<li>${p}</li>`).join('');
+    } catch(e){
+      document.getElementById('paywallResults').style.display='none';
+    }
+  } else {
+    document.getElementById('paywallResults').style.display='none';
+  }
+  document.getElementById('paywallModal').style.display='flex';
+}
 function closePaywall(){document.getElementById("paywallModal").style.display="none";}
 async function startCheckout(){const email=document.getElementById("paywallEmail").value.trim();if(!email||!email.includes("@")){alert("Por favor introduce un email valido.");return;}const btn=document.getElementById("paywallBtn");btn.disabled=true;btn.textContent="Redirigiendo al pago...";try{const res=await fetch("https://entria-proxy.jobwinspain.workers.dev/checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});const data=await res.json();if(data.url){window.location.href=data.url;}else{alert("Error al iniciar el pago.");btn.disabled=false;btn.textContent="Pagar 4,99 EUR con tarjeta 2192";}}catch(e){alert("Error de conexion.");btn.disabled=false;btn.textContent="Pagar 4,99 EUR con tarjeta 2192";}}
 function contactPro(){
@@ -654,7 +703,7 @@ async function sendAnswer(){
   const inp=document.getElementById('userInput');
   const text=inp.value.trim();
   if(!text||S.loading||S.done)return;
-  if(S.qCount>=5&&!S.done){showPaywall();return;}
+  if(S.qCount>=5&&!S.done){showPaywall(true);return;}
   S.loading=true;document.getElementById('sendBtn').disabled=true;
   inp.value='';inp.style.height='auto';
   addMsg('user',text,false);S.history.push({role:'user',content:text});showTyping();
