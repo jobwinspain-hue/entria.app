@@ -1,14 +1,5 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "entria-api",
+  "name": "entria-proxy",
   "compatibility_date": "2026-05-09",
-  "observability": {
-    "enabled": true
-  },
-  "assets": {
-    "directory": "."
-  },
-  "compatibility_flags": [
-    "nodejs_compat"
-  ]
+  "main": "worker.js"
 }
