@@ -31,7 +31,7 @@ input:focus{border-color:var(--accent)}
 .btn-out{background:rgba(255,255,255,0.1);color:white;border:none;padding:7px 14px;border-radius:6px;font-size:13px;cursor:pointer;font-family:'Instrument Sans',sans-serif}
 .btn-out:hover{background:rgba(255,255,255,0.2)}
 .panel-body{max-width:900px;margin:0 auto;padding:40px 32px}
-.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:36px}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:36px}@media(min-width:900px){.stats-grid{grid-template-columns:repeat(5,1fr)}}
 .stat-box{background:white;border:1px solid var(--border);border-radius:12px;padding:22px;text-align:center}
 .stat-n{font-family:'DM Serif Display',serif;font-size:36px;color:var(--accent)}
 .stat-l{font-size:13px;color:var(--ink2);margin-top:4px}
@@ -86,6 +86,8 @@ input:focus{border-color:var(--accent)}
       <div class="stat-box"><div class="stat-n" id="sTotal">—</div><div class="stat-l">Usuarios totales</div></div>
       <div class="stat-box"><div class="stat-n" id="sPro">—</div><div class="stat-l">Usuarios Pro</div></div>
       <div class="stat-box"><div class="stat-n" id="sFree">—</div><div class="stat-l">Usuarios gratuitos</div></div>
+      <div class="stat-box"><div class="stat-n" id="sEntrevistasFree">—</div><div class="stat-l">Entrevistas free realizadas</div></div>
+      <div class="stat-box"><div class="stat-n" id="sEntrevistasPro">—</div><div class="stat-l">Entrevistas Pro realizadas</div></div>
     </div>
 
     <div class="section-h">Activar usuario Pro</div>
@@ -137,13 +139,19 @@ async function doLogout(){await supa.auth.signOut();location.reload();}
 async function loadUsers(){
   document.getElementById('tLoader').style.display='block';
   document.getElementById('tbody').innerHTML='';
-  const{data}=await supa.from('profiles').select('*').order('created_at',{ascending:false});
+  const[{data},{count:freeCount},{count:proCount}]=await Promise.all([
+    supa.from('profiles').select('*').order('created_at',{ascending:false}),
+    supa.from('entrevistas_free').select('*',{count:'exact',head:true}),
+    supa.from('entrevistas').select('*',{count:'exact',head:true})
+  ]);
   document.getElementById('tLoader').style.display='none';
   if(!data||!data.length){document.getElementById('tbody').innerHTML='<div class="empty">Sin usuarios aún.</div>';return;}
   const pro=data.filter(p=>p.is_pro).length;
   document.getElementById('sTotal').textContent=data.length;
   document.getElementById('sPro').textContent=pro;
   document.getElementById('sFree').textContent=data.length-pro;
+  document.getElementById('sEntrevistasFree').textContent=freeCount||0;
+  document.getElementById('sEntrevistasPro').textContent=proCount||0;
   document.getElementById('tbody').innerHTML=data.map(p=>{
     const date=p.created_at?new Date(p.created_at).toLocaleDateString('es-ES'):'-';
     return `<div class="t-row">
