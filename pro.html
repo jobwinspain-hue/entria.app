@@ -7,6 +7,7 @@
 <title>EntrIA Pro — Tu simulador de entrevistas</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -238,8 +239,8 @@ textarea{resize:vertical;min-height:120px;line-height:1.6}
     <!-- DASHBOARD -->
     <div class="view active" id="viewDashboard">
       <div class="dash-header">
-        <h1>Hola 👋</h1>
-        <p>La preparación es la base del éxito. Comienza, aquí tienes tu resumen de progreso y tus últimas entrevistas.</p>
+        <h1>Buenos días 👋</h1>
+        <p>Aquí tienes tu resumen de progreso y tus últimas entrevistas.</p>
       </div>
       <div class="dash-stats">
         <div class="dash-stat">
@@ -255,6 +256,15 @@ textarea{resize:vertical;min-height:120px;line-height:1.6}
           <div class="dash-stat-label">Mejor puntuación</div>
         </div>
       </div>
+      <!-- RADAR CHART -->
+      <div id="radarSection" style="background:white;border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:24px;display:none">
+        <div style="font-family:'DM Serif Display',serif;font-size:18px;font-weight:400;margin-bottom:6px">Tu perfil como candidato</div>
+        <div style="font-size:13px;color:var(--ink2);margin-bottom:20px">Media de todas tus entrevistas</div>
+        <div style="max-width:320px;margin:0 auto">
+          <canvas id="radarChart"></canvas>
+        </div>
+      </div>
+
       <div class="dash-cta">
         <div>
           <h2>¿Listo para practicar?</h2>
@@ -573,8 +583,9 @@ async function generateResults(){
     .map(m=>`${m.role==='user'?S.nombre:'Entrevistador'}: ${m.content.replace('ENTREVISTA_COMPLETADA','')}`)
     .join('\n\n');
   const prompt=`Analiza esta entrevista para "${S.puesto}" y responde SOLO con JSON sin backticks:
-{"puntuacion":75,"nivel":"Bueno","resumen":"párrafo corto","puntosFuertes":["p1","p2","p3"],"mejorar":["m1","m2","m3"],"consejo":"consejo accionable"}
+{"puntuacion":75,"nivel":"Bueno","resumen":"párrafo corto","puntosFuertes":["p1","p2","p3"],"mejorar":["m1","m2","m3"],"consejo":"consejo accionable","claridad":70,"seguridad":65,"vocabulario":75,"empatia":80,"agilidad":70,"motivacion":85}
 Niveles: Necesita mejorar / Aceptable / Bueno / Muy bueno / Excelente
+Las 6 variables van de 0 a 100: claridad (estructura y claridad de respuestas), seguridad (confianza al hablar), vocabulario (riqueza y precisión), empatia (conexión con el entrevistador), agilidad (concisión y rapidez), motivacion (interés genuino por el puesto).
 ENTREVISTA:\n${conv.substring(0,4000)}`;
   try{
     const r=await api('Eres evaluador experto en RRHH. Responde SOLO con JSON válido.',
@@ -593,7 +604,13 @@ ENTREVISTA:\n${conv.substring(0,4000)}`;
     resumen:S.evalData.resumen,
     puntos_fuertes:S.evalData.puntosFuertes,
     areas_mejora:S.evalData.mejorar,
-    consejo:S.evalData.consejo
+    consejo:S.evalData.consejo,
+    claridad:S.evalData.claridad||0,
+    seguridad:S.evalData.seguridad||0,
+    vocabulario:S.evalData.vocabulario||0,
+    empatia:S.evalData.empatia||0,
+    agilidad:S.evalData.agilidad||0,
+    motivacion:S.evalData.motivacion||0
   });
 
   hideLoader();showView('results');renderResults(S.evalData);
@@ -603,7 +620,8 @@ function fallbackData(){
   return{puntuacion:68,nivel:'Bueno',resumen:'Has completado la entrevista satisfactoriamente.',
     puntosFuertes:['Comunicación clara','Actitud positiva','Conocimiento del sector'],
     mejorar:['Estructurar con método STAR','Aportar ejemplos con datos','Preparar preguntas para el entrevistador'],
-    consejo:'Practica con el método STAR: Situación, Tarea, Acción y Resultado.'};
+    consejo:'Practica con el método STAR: Situación, Tarea, Acción y Resultado.',
+    claridad:65,seguridad:60,vocabulario:70,empatia:75,agilidad:65,motivacion:80};
 }
 
 function renderResults(d){
@@ -611,7 +629,52 @@ function renderResults(d){
   document.getElementById('resultsSubtitle').textContent=`${S.puesto} · ${S.nombre} · ${new Date().toLocaleDateString('es-ES')}`;
   const col=d.puntuacion>=75?'#2d6a4f':d.puntuacion>=55?'#b7621b':'#c0392b';
   const bg=d.puntuacion>=75?'#d8f3dc':d.puntuacion>=55?'#fef3e2':'#fde8d8';
+  // Mini radar en resultados
+  setTimeout(()=>{
+    const d2=S.evalData;
+    const vars2=['claridad','seguridad','vocabulario','empatia','agilidad','motivacion'];
+    const labels2=['Claridad','Seguridad','Vocabulario','Empatía','Agilidad','Motivación'];
+    const hasVars2=vars2.some(v=>d2[v]>0);
+    if(hasVars2){
+      const ctx2=document.getElementById('resultRadar');
+      if(ctx2){
+        if(window._resultChart) window._resultChart.destroy();
+        window._resultChart=new Chart(ctx2,{
+          type:'radar',
+          data:{
+            labels:labels2,
+            datasets:[{
+              data:vars2.map(v=>d2[v]||0),
+              backgroundColor:'rgba(45,106,79,0.15)',
+              borderColor:'#2d6a4f',
+              borderWidth:2,
+              pointBackgroundColor:'#2d6a4f',
+              pointBorderColor:'white',
+              pointBorderWidth:2,
+              pointRadius:4
+            }]
+          },
+          options:{
+            responsive:true,
+            plugins:{legend:{display:false}},
+            scales:{r:{
+              beginAtZero:true,max:100,
+              ticks:{stepSize:25,font:{size:9},color:'#5a5650'},
+              grid:{color:'rgba(26,24,20,0.08)'},
+              pointLabels:{font:{size:11,family:'Instrument Sans'},color:'#1a1814'},
+              angleLines:{color:'rgba(26,24,20,0.08)'}
+            }}
+          }
+        });
+      }
+    }
+  },100);
+
   document.getElementById('resultsContent').innerHTML=`
+    <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:16px">
+      <div style="font-family:'DM Serif Display',serif;font-size:16px;margin-bottom:4px">Tu perfil en esta entrevista</div>
+      <div style="max-width:280px;margin:0 auto"><canvas id="resultRadar"></canvas></div>
+    </div>
     <div class="score-card">
       <div class="score-circle" style="background:${bg}">
         <div class="score-num" style="color:${col}">${d.puntuacion}</div>
