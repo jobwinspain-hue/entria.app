@@ -286,7 +286,7 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
     <!-- CTA -->
     <div class="paywall-icon">🚀</div>
     <h2>Consigue EntrIA Pro</h2>
-    <p id="paywallDesc">Sigue con tu entrevista, mejora tu progreso, descubre tu evolución y recibe asesoramiento con coach personalizado, continúa con la versión Pro.</p>
+    <p id="paywallDesc">Para seguir con tu entrevista, descubrir tu evolución y recibir asesoramiento con coach personalizado, continúa con la versión Pro.</p>
     <div class="paywall-price">4,99 EUR</div>
     <div class="paywall-price-sub">pago único — tuyo para siempre</div>
     <ul class="paywall-features">
@@ -619,7 +619,7 @@ ENTREVISTA PARCIAL:\n${conv.substring(0,2000)}`;
   document.getElementById('paywallModal').style.display='flex';
 }
 function closePaywall(){document.getElementById("paywallModal").style.display="none";}
-async function startCheckout(){const email=document.getElementById("paywallEmail").value.trim();if(!email||!email.includes("@")){alert("Por favor introduce un email valido.");return;}const btn=document.getElementById("paywallBtn");btn.disabled=true;btn.textContent="Redirigiendo al pago...";try{const res=await fetch("https://entria-proxy.jobwinspain.workers.dev/checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});const data=await res.json();if(data.url){window.location.href=data.url;}else{alert("Error al iniciar el pago.");btn.disabled=false;btn.textContent="Pagar 4,99 EUR con tarjeta 2192";}}catch(e){alert("Error de conexion.");btn.disabled=false;btn.textContent="Pagar 4,99 EUR con tarjeta 2192";}}
+async function startCheckout(){const email=document.getElementById("paywallEmail").value.trim();if(!email||!email.includes("@")){alert("Por favor introduce un email valido.");return;}const btn=document.getElementById("paywallBtn");btn.disabled=true;btn.textContent="Redirigiendo al pago...";try{const res=await fetch("https://entria-proxy-new.jobwinspain.workers.dev/checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email})});const data=await res.json();if(data.url){window.location.href=data.url;}else{alert("Error al iniciar el pago.");btn.disabled=false;btn.textContent="Pagar 4,99 EUR con tarjeta 2192";}}catch(e){alert("Error de conexion.");btn.disabled=false;btn.textContent="Pagar 4,99 EUR con tarjeta 2192";}}
 function contactPro(){
   window.open('mailto:hola@entria.es?subject=Quiero%20EntrIA%20Pro&body=Hola%2C%20quiero%20el%20acceso%20Pro%20por%204%2C99%20EUR.%20Mi%20email%20es%3A%20','_blank');
 }
@@ -848,7 +848,7 @@ window.addEventListener('load', async() => {
 });
 
 async function api(sys,msgs){
-  const r=await fetch('https://entria-proxy.jobwinspain.workers.dev/',{
+  const r=await fetch('https://entria-proxy-new.jobwinspain.workers.dev/',{
     method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:msgs})
   });
