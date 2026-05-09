@@ -335,7 +335,7 @@ textarea{resize:vertical;min-height:120px;line-height:1.6}
             <polyline points="5,17 10,22 18,11" stroke="rgba(255,255,255,0.4)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
             <polyline points="10,17 15,22 26,11" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
           </svg>
-          EntrIA</span>
+          Entr<span>IA</span>
           <span class="pro-indicator">PRO ✓</span>
         </div>
         <div class="progress-area">
@@ -706,7 +706,7 @@ function renderResults(d){
   }
 }
 
-function downloadPDF(){
+async function downloadPDF(){
   const btn=document.getElementById('downloadBtn');
   btn.disabled=true;btn.textContent='Generando PDF...';
   try{
@@ -727,12 +727,15 @@ function downloadPDF(){
     doc.text(new Date().toLocaleDateString('es-ES'),margin+145,y+15);y+=30;
     const d=S.evalData;
     const sc=d.puntuacion>=75?[45,106,79]:d.puntuacion>=55?[183,98,27]:[192,57,43];
-    doc.setFillColor(...sc);doc.roundedRect(margin,y,cW,28,3,3,'F');
+    // Score card - calculate height based on resumen text
+    const rlPre=doc.splitTextToSize(d.resumen||'',cW-65);
+    const scoreH=Math.max(28, rlPre.length*5+20);
+    doc.setFillColor(...sc);doc.roundedRect(margin,y,cW,scoreH,3,3,'F');
     doc.setFontSize(26);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
     doc.text(`${d.puntuacion}/100`,margin+8,y+19);
     doc.setFontSize(13);doc.setFont('helvetica','normal');doc.text(d.nivel,margin+56,y+13);
-    doc.setFontSize(9);const rl=doc.splitTextToSize(d.resumen,cW-65);
-    doc.text(rl,margin+56,y+20);y+=36;
+    doc.setFontSize(9);const rl=doc.splitTextToSize(d.resumen||'',cW-65);
+    doc.text(rl,margin+56,y+20);y+=scoreH+8;
     const section=(title,items,col)=>{
       if(!items||items.length===0)return;
       checkPage(20+items.length*12);
@@ -755,13 +758,64 @@ function downloadPDF(){
     };
     section('Puntos fuertes',d.puntosFuertes||[],[45,106,79]);
     section('Areas de mejora',d.mejorar||[],[181,69,27]);
-    checkPage(26);
-    doc.setFillColor(216,243,220);doc.roundedRect(margin,y,cW,22,3,3,'F');
+    // Consejo clave - dynamic height
+    const cl=doc.splitTextToSize(d.consejo||'',cW-16);
+    const consejoH=Math.max(26, cl.length*6+18);
+    checkPage(consejoH+8);
+    doc.setFillColor(216,243,220);doc.roundedRect(margin,y,cW,consejoH,3,3,'F');
     doc.setFontSize(10);doc.setFont('helvetica','bold');doc.setTextColor(45,106,79);
     doc.text('Consejo clave',margin+6,y+8);
     doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(26,24,20);
-    const cl=doc.splitTextToSize(d.consejo||'',cW-12);
-    doc.text(cl,margin+6,y+15);y+=26+cl.length*1.5;
+    doc.text(cl,margin+6,y+15);y+=consejoH+8;
+
+    // Añadir gráfico radar si existe
+    const vars=['claridad','seguridad','vocabulario','empatia','agilidad','motivacion'];
+    const hasVarsInPDF=vars.some(v=>d[v]>0);
+    if(hasVarsInPDF){
+      // Crear canvas temporal para el radar
+      const tempCanvas=document.createElement('canvas');
+      tempCanvas.width=400;tempCanvas.height=400;
+      document.body.appendChild(tempCanvas);
+      const tempCtx=tempCanvas.getContext('2d');
+      const tempChart=new Chart(tempCtx,{
+        type:'radar',
+        data:{
+          labels:['Claridad','Seguridad','Vocabulario','Empatía','Agilidad','Motivación'],
+          datasets:[{
+            data:vars.map(v=>d[v]||0),
+            backgroundColor:'rgba(45,106,79,0.15)',
+            borderColor:'#2d6a4f',
+            borderWidth:2,
+            pointBackgroundColor:'#2d6a4f',
+            pointBorderColor:'white',
+            pointBorderWidth:2,
+            pointRadius:5
+          }]
+        },
+        options:{
+          responsive:false,
+          animation:false,
+          plugins:{legend:{display:false}},
+          scales:{r:{
+            beginAtZero:true,max:100,
+            ticks:{stepSize:25,font:{size:14},color:'#5a5650'},
+            grid:{color:'rgba(26,24,20,0.1)'},
+            pointLabels:{font:{size:14},color:'#1a1814'},
+            angleLines:{color:'rgba(26,24,20,0.1)'}
+          }}
+        }
+      });
+      // Wait for render then add to PDF
+      await new Promise(r=>setTimeout(r,500));
+      const imgData=tempCanvas.toDataURL('image/png');
+      checkPage(80);
+      doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(45,106,79);
+      doc.text('Tu perfil como candidato',margin,y);y+=8;
+      doc.addImage(imgData,'PNG',margin+15,y,cW-30,cW-30);
+      y+=cW-30+8;
+      tempChart.destroy();
+      document.body.removeChild(tempCanvas);
+    }
 
     const total=doc.internal.getNumberOfPages();
     for(let p=1;p<=total;p++){
