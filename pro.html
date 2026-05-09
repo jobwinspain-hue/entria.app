@@ -480,9 +480,15 @@ function viewHistoryItem(id){
     puntuacion:item.puntuacion||0,
     nivel:item.nivel_evaluacion||item.nivel||'',
     resumen:item.resumen||'',
-    puntosFuertes:Array.isArray(pf)?pf:[],
-    mejorar:Array.isArray(am)?am:[],
-    consejo:item.consejo||''
+    puntosFuertes:Array.isArray(pf)?pf:(typeof pf==='string'?JSON.parse(pf||'[]'):[]),
+    mejorar:Array.isArray(am)?am:(typeof am==='string'?JSON.parse(am||'[]'):[]),
+    consejo:item.consejo||'',
+    claridad:item.claridad||0,
+    seguridad:item.seguridad||0,
+    vocabulario:item.vocabulario||0,
+    empatia:item.empatia||0,
+    agilidad:item.agilidad||0,
+    motivacion:item.motivacion||0
   };
   S.puesto=item.puesto||'';S.nombre=item.candidato||'Tu';
   showView('results');
