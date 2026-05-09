@@ -457,7 +457,7 @@ function renderHistory(){
     const date=new Date(e.created_at).toLocaleDateString('es-ES');
     const nivelCol=e.puntuacion>=75?'#d8f3dc':e.puntuacion>=55?'#fef3e2':'#fde8d8';
     const nivelTxt=e.puntuacion>=75?'#2d6a4f':e.puntuacion>=55?'#b7621b':'#c0392b';
-    return `<div class="history-item" onclick="viewHistoryItem(${e.id})">
+    return `<div class="history-item" onclick="viewHistoryItem('${e.id}')">
       <div class="history-score" style="background:${bg}">
         <div class="history-score-num" style="color:${col}">${e.puntuacion||'?'}</div>
         <div class="history-score-sub" style="color:${col}">/100</div>
