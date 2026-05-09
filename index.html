@@ -651,6 +651,10 @@ async function startInterview(){
     document.getElementById('inputFooter').style.display='flex';
     addMsg('ai',reply,false);updateProgress();setupKeys();
     window.scrollTo(0,0);
+    // Registrar entrevista free de forma anónima
+    supa.from('entrevistas_free').insert({
+      puesto:S.puesto, sector:S.sector, nivel:S.nivel
+    }).then(()=>{}).catch(()=>{});
   }catch(e){hideLoader();alert('Error de conexión. Inténtalo de nuevo.');}
 }
 
