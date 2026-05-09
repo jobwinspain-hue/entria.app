@@ -23,7 +23,7 @@ html,body{height:100%;background:var(--bg);color:var(--ink);font-family:'Instrum
 /* SIDEBAR */
 .sidebar{width:260px;background:#e8e4db;color:var(--ink);display:flex;flex-direction:column;flex-shrink:0;border-right:1px solid rgba(26,24,20,0.12)}
 .sidebar-logo{display:flex;align-items:center;gap:10px;padding:22px 20px;border-bottom:1px solid rgba(26,24,20,0.08)}
-.sidebar-logo-text{font-family:'Instrument Sans',sans-serif;font-size:18px;font-weight:600;display:flex;align-items:center;gap:4px}
+.sidebar-logo-text{font-family:'Instrument Sans',sans-serif;font-size:18px;font-weight:600}
 .sidebar-logo-text span{color:var(--accent2)}
 .pro-chip{font-size:9px;background:linear-gradient(135deg,var(--gold),#e8c88a);color:#1a1814;padding:1px 6px;border-radius:6px;font-weight:700;position:relative;top:-8px;margin-left:2px}
 .sidebar-section{padding:20px 16px 8px;font-size:11px;font-weight:600;color:rgba(26,24,20,0.35);letter-spacing:1px;text-transform:uppercase}
@@ -195,15 +195,13 @@ textarea{resize:vertical;min-height:120px;line-height:1.6}
 <div class="app">
   <!-- SIDEBAR -->
   <div class="sidebar">
-    <div class="sidebar-logo" onclick="showView('dashboard')" style="cursor:pointer;flex-direction:column;align-items:center;gap:2px">
-      <div style="display:flex;align-items:center;gap:8px">
-        <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-          <rect width="32" height="32" rx="8" fill="#52b788"/>
-          <polyline points="5,17 10,22 18,11" stroke="rgba(255,255,255,0.4)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          <polyline points="10,17 15,22 26,11" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        </svg>
-        <div class="sidebar-logo-text">EntrIA<span class="pro-chip">PRO</span></div>
-      </div>
+    <div class="sidebar-logo" onclick="showView('dashboard')" style="cursor:pointer;flex-direction:column;gap:4px;align-items:center">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="#52b788"/>
+        <polyline points="5,17 10,22 18,11" stroke="rgba(255,255,255,0.4)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <polyline points="10,17 15,22 26,11" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <div class="sidebar-logo-text">Entr<span>IA</span> <span class="pro-chip">PRO</span></div>
       <div style="font-size:10px;color:var(--ink2);font-weight:500;letter-spacing:0.3px">Inicio</div>
     </div>
 
@@ -532,8 +530,7 @@ function addMsg(role,text,checkDone=true){
   const clean=text.replace('ENTREVISTA_COMPLETADA','').trim();
   const div=document.createElement('div');div.className='msg '+role;
   const av=role==='ai'?'E':S.nombre.charAt(0).toUpperCase();
-  const name=role==='ai'?'EntrIA · Tu coach personal':S.nombre;
-  div.innerHTML=`<div style="display:flex;flex-direction:column;align-items:${role==='ai'?'flex-start':'flex-end'};gap:3px"><div style="font-size:11px;color:var(--ink2);font-weight:500;padding:0 4px">${name}</div><div style="display:flex;gap:10px;${role==='user'?'flex-direction:row-reverse':''}"><div class="msg-avatar">${av}</div><div class="msg-bubble">${clean.replace(/\n/g,'<br>')}</div></div></div>`;
+  div.innerHTML=`<div class="msg-avatar">${av}</div><div class="msg-bubble">${clean.replace(/\n/g,'<br>')}</div>`;
   chat.appendChild(div);chat.scrollTop=chat.scrollHeight;
   if(checkDone&&isDone){
     S.done=true;
@@ -547,7 +544,7 @@ function addMsg(role,text,checkDone=true){
 function showTyping(){
   const chat=document.getElementById('chatArea');
   const div=document.createElement('div');div.className='msg ai';div.id='typing';
-  div.innerHTML='<div style="display:flex;flex-direction:column;gap:3px"><div style="font-size:11px;color:var(--ink2);font-weight:500;padding:0 4px">EntrIA · Tu coach personal</div><div style="display:flex;gap:10px"><div class="msg-avatar">E</div><div class="typing-indicator"><span></span><span></span><span></span></div></div></div>';
+  div.innerHTML='<div class="msg-avatar">E</div><div class="typing-indicator"><span></span><span></span><span></span></div>';
   chat.appendChild(div);chat.scrollTop=chat.scrollHeight;
 }
 function hideTyping(){const t=document.getElementById('typing');if(t)t.remove();}
@@ -598,7 +595,7 @@ ENTREVISTA:\n${conv.substring(0,4000)}`;
   }catch(e){S.evalData=fallbackData();}
 
   // Save to Supabase
-  const{error:insertError}=await supa.from('entrevistas').insert({
+  await supa.from('entrevistas').insert({
     user_id:currentUser.id,
     puesto:S.puesto,sector:S.sector,nivel:S.nivel,
     candidato:S.nombre,
@@ -615,8 +612,6 @@ ENTREVISTA:\n${conv.substring(0,4000)}`;
     agilidad:S.evalData.agilidad||0,
     motivacion:S.evalData.motivacion||0
   });
-  if(insertError) console.error('ERROR GUARDANDO ENTREVISTA:', JSON.stringify(insertError));
-  else console.log('Entrevista guardada OK');
 
   hideLoader();showView('results');renderResults(S.evalData);
 }
@@ -634,16 +629,52 @@ function renderResults(d){
   document.getElementById('resultsSubtitle').textContent=`${S.puesto} · ${S.nombre} · ${new Date().toLocaleDateString('es-ES')}`;
   const col=d.puntuacion>=75?'#2d6a4f':d.puntuacion>=55?'#b7621b':'#c0392b';
   const bg=d.puntuacion>=75?'#d8f3dc':d.puntuacion>=55?'#fef3e2':'#fde8d8';
+  // Mini radar en resultados
+  setTimeout(()=>{
+    const d2=S.evalData;
+    const vars2=['claridad','seguridad','vocabulario','empatia','agilidad','motivacion'];
+    const labels2=['Claridad','Seguridad','Vocabulario','Empatía','Agilidad','Motivación'];
+    const hasVars2=vars2.some(v=>d2[v]>0);
+    if(hasVars2){
+      const ctx2=document.getElementById('resultRadar');
+      if(ctx2){
+        if(window._resultChart) window._resultChart.destroy();
+        window._resultChart=new Chart(ctx2,{
+          type:'radar',
+          data:{
+            labels:labels2,
+            datasets:[{
+              data:vars2.map(v=>d2[v]||0),
+              backgroundColor:'rgba(45,106,79,0.15)',
+              borderColor:'#2d6a4f',
+              borderWidth:2,
+              pointBackgroundColor:'#2d6a4f',
+              pointBorderColor:'white',
+              pointBorderWidth:2,
+              pointRadius:4
+            }]
+          },
+          options:{
+            responsive:true,
+            plugins:{legend:{display:false}},
+            scales:{r:{
+              beginAtZero:true,max:100,
+              ticks:{stepSize:25,font:{size:9},color:'#5a5650'},
+              grid:{color:'rgba(26,24,20,0.08)'},
+              pointLabels:{font:{size:11,family:'Instrument Sans'},color:'#1a1814'},
+              angleLines:{color:'rgba(26,24,20,0.08)'}
+            }}
+          }
+        });
+      }
+    }
+  },100);
 
-  const vars2=['claridad','seguridad','vocabulario','empatia','agilidad','motivacion'];
-  const hasVars2=vars2.some(v=>d[v]>0);
-
-  // 1. Primero insertar el HTML completo
   document.getElementById('resultsContent').innerHTML=`
-    ${hasVars2?`<div style="background:white;border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:16px;text-align:center">
-      <div style="font-family:'DM Serif Display',serif;font-size:16px;margin-bottom:4px;text-align:left">Tu perfil en esta entrevista</div>
+    <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:16px">
+      <div style="font-family:'DM Serif Display',serif;font-size:16px;margin-bottom:4px">Tu perfil en esta entrevista</div>
       <div style="max-width:280px;margin:0 auto"><canvas id="resultRadar"></canvas></div>
-    </div>`:''}
+    </div>
     <div class="score-card">
       <div class="score-circle" style="background:${bg}">
         <div class="score-num" style="color:${col}">${d.puntuacion}</div>
@@ -662,42 +693,6 @@ function renderResults(d){
     <div class="feedback-section" style="border-left:3px solid #2d6a4f">
       <h3>Consejo clave</h3><p>${d.consejo}</p>
     </div>`;
-
-  // 2. Luego renderizar el radar DESPUÉS de que el canvas esté en el DOM
-  if(hasVars2){
-    const labels2=['Claridad','Seguridad','Vocabulario','Empatía','Agilidad','Motivación'];
-    const ctx2=document.getElementById('resultRadar');
-    if(ctx2){
-      if(window._resultChart) window._resultChart.destroy();
-      window._resultChart=new Chart(ctx2,{
-        type:'radar',
-        data:{
-          labels:labels2,
-          datasets:[{
-            data:vars2.map(v=>d[v]||0),
-            backgroundColor:'rgba(45,106,79,0.15)',
-            borderColor:'#2d6a4f',
-            borderWidth:2,
-            pointBackgroundColor:'#2d6a4f',
-            pointBorderColor:'white',
-            pointBorderWidth:2,
-            pointRadius:4
-          }]
-        },
-        options:{
-          responsive:true,
-          plugins:{legend:{display:false}},
-          scales:{r:{
-            beginAtZero:true,max:100,
-            ticks:{stepSize:25,font:{size:9},color:'#5a5650'},
-            grid:{color:'rgba(26,24,20,0.08)'},
-            pointLabels:{font:{size:11,family:'Instrument Sans'},color:'#1a1814'},
-            angleLines:{color:'rgba(26,24,20,0.08)'}
-          }}
-        }
-      });
-    }
-  }
 }
 
 function downloadPDF(){
