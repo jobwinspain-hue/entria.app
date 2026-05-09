@@ -629,52 +629,16 @@ function renderResults(d){
   document.getElementById('resultsSubtitle').textContent=`${S.puesto} · ${S.nombre} · ${new Date().toLocaleDateString('es-ES')}`;
   const col=d.puntuacion>=75?'#2d6a4f':d.puntuacion>=55?'#b7621b':'#c0392b';
   const bg=d.puntuacion>=75?'#d8f3dc':d.puntuacion>=55?'#fef3e2':'#fde8d8';
-  // Mini radar en resultados
-  setTimeout(()=>{
-    const d2=S.evalData;
-    const vars2=['claridad','seguridad','vocabulario','empatia','agilidad','motivacion'];
-    const labels2=['Claridad','Seguridad','Vocabulario','Empatía','Agilidad','Motivación'];
-    const hasVars2=vars2.some(v=>d2[v]>0);
-    if(hasVars2){
-      const ctx2=document.getElementById('resultRadar');
-      if(ctx2){
-        if(window._resultChart) window._resultChart.destroy();
-        window._resultChart=new Chart(ctx2,{
-          type:'radar',
-          data:{
-            labels:labels2,
-            datasets:[{
-              data:vars2.map(v=>d2[v]||0),
-              backgroundColor:'rgba(45,106,79,0.15)',
-              borderColor:'#2d6a4f',
-              borderWidth:2,
-              pointBackgroundColor:'#2d6a4f',
-              pointBorderColor:'white',
-              pointBorderWidth:2,
-              pointRadius:4
-            }]
-          },
-          options:{
-            responsive:true,
-            plugins:{legend:{display:false}},
-            scales:{r:{
-              beginAtZero:true,max:100,
-              ticks:{stepSize:25,font:{size:9},color:'#5a5650'},
-              grid:{color:'rgba(26,24,20,0.08)'},
-              pointLabels:{font:{size:11,family:'Instrument Sans'},color:'#1a1814'},
-              angleLines:{color:'rgba(26,24,20,0.08)'}
-            }}
-          }
-        });
-      }
-    }
-  },100);
 
+  const vars2=['claridad','seguridad','vocabulario','empatia','agilidad','motivacion'];
+  const hasVars2=vars2.some(v=>d[v]>0);
+
+  // 1. Primero insertar el HTML completo
   document.getElementById('resultsContent').innerHTML=`
-    <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:16px">
-      <div style="font-family:'DM Serif Display',serif;font-size:16px;margin-bottom:4px">Tu perfil en esta entrevista</div>
+    ${hasVars2?`<div style="background:white;border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:16px;text-align:center">
+      <div style="font-family:'DM Serif Display',serif;font-size:16px;margin-bottom:4px;text-align:left">Tu perfil en esta entrevista</div>
       <div style="max-width:280px;margin:0 auto"><canvas id="resultRadar"></canvas></div>
-    </div>
+    </div>`:''}
     <div class="score-card">
       <div class="score-circle" style="background:${bg}">
         <div class="score-num" style="color:${col}">${d.puntuacion}</div>
@@ -693,6 +657,42 @@ function renderResults(d){
     <div class="feedback-section" style="border-left:3px solid #2d6a4f">
       <h3>Consejo clave</h3><p>${d.consejo}</p>
     </div>`;
+
+  // 2. Luego renderizar el radar DESPUÉS de que el canvas esté en el DOM
+  if(hasVars2){
+    const labels2=['Claridad','Seguridad','Vocabulario','Empatía','Agilidad','Motivación'];
+    const ctx2=document.getElementById('resultRadar');
+    if(ctx2){
+      if(window._resultChart) window._resultChart.destroy();
+      window._resultChart=new Chart(ctx2,{
+        type:'radar',
+        data:{
+          labels:labels2,
+          datasets:[{
+            data:vars2.map(v=>d[v]||0),
+            backgroundColor:'rgba(45,106,79,0.15)',
+            borderColor:'#2d6a4f',
+            borderWidth:2,
+            pointBackgroundColor:'#2d6a4f',
+            pointBorderColor:'white',
+            pointBorderWidth:2,
+            pointRadius:4
+          }]
+        },
+        options:{
+          responsive:true,
+          plugins:{legend:{display:false}},
+          scales:{r:{
+            beginAtZero:true,max:100,
+            ticks:{stepSize:25,font:{size:9},color:'#5a5650'},
+            grid:{color:'rgba(26,24,20,0.08)'},
+            pointLabels:{font:{size:11,family:'Instrument Sans'},color:'#1a1814'},
+            angleLines:{color:'rgba(26,24,20,0.08)'}
+          }}
+        }
+      });
+    }
+  }
 }
 
 function downloadPDF(){
