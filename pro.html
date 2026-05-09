@@ -195,13 +195,13 @@ textarea{resize:vertical;min-height:120px;line-height:1.6}
 <div class="app">
   <!-- SIDEBAR -->
   <div class="sidebar">
-    <div class="sidebar-logo" onclick="showView('dashboard')" style="cursor:pointer;flex-direction:column;gap:4px;align-items:center">
+    <div class="sidebar-logo" onclick="showView('dashboard')" style="cursor:pointer">
       <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
         <rect width="32" height="32" rx="8" fill="#52b788"/>
         <polyline points="5,17 10,22 18,11" stroke="rgba(255,255,255,0.4)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         <polyline points="10,17 15,22 26,11" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       </svg>
-      <div class="sidebar-logo-text">Entr<span>IA</span> <span class="pro-chip">PRO</span></div>
+      <div class="sidebar-logo-text">Entr<span>IA</span><span class="pro-chip">PRO</span></div>
       <div style="font-size:10px;color:var(--ink2);font-weight:500;letter-spacing:0.3px">Inicio</div>
     </div>
 
@@ -530,7 +530,8 @@ function addMsg(role,text,checkDone=true){
   const clean=text.replace('ENTREVISTA_COMPLETADA','').trim();
   const div=document.createElement('div');div.className='msg '+role;
   const av=role==='ai'?'E':S.nombre.charAt(0).toUpperCase();
-  div.innerHTML=`<div class="msg-avatar">${av}</div><div class="msg-bubble">${clean.replace(/\n/g,'<br>')}</div>`;
+  const name=role==='ai'?'EntrIA · Tu coach personal':S.nombre;
+  div.innerHTML=`<div style="display:flex;flex-direction:column;align-items:${role==='ai'?'flex-start':'flex-end'};gap:3px"><div style="font-size:11px;color:var(--ink2);font-weight:500;padding:0 4px">${name}</div><div style="display:flex;gap:10px;${role==='user'?'flex-direction:row-reverse':''}"><div class="msg-avatar">${av}</div><div class="msg-bubble">${clean.replace(/\n/g,'<br>')}</div></div></div>`;
   chat.appendChild(div);chat.scrollTop=chat.scrollHeight;
   if(checkDone&&isDone){
     S.done=true;
@@ -544,7 +545,7 @@ function addMsg(role,text,checkDone=true){
 function showTyping(){
   const chat=document.getElementById('chatArea');
   const div=document.createElement('div');div.className='msg ai';div.id='typing';
-  div.innerHTML='<div class="msg-avatar">E</div><div class="typing-indicator"><span></span><span></span><span></span></div>';
+  div.innerHTML='<div style="display:flex;flex-direction:column;gap:3px"><div style="font-size:11px;color:var(--ink2);font-weight:500;padding:0 4px">EntrIA · Tu coach personal</div><div style="display:flex;gap:10px"><div class="msg-avatar">E</div><div class="typing-indicator"><span></span><span></span><span></span></div></div></div>';
   chat.appendChild(div);chat.scrollTop=chat.scrollHeight;
 }
 function hideTyping(){const t=document.getElementById('typing');if(t)t.remove();}
@@ -595,7 +596,7 @@ ENTREVISTA:\n${conv.substring(0,4000)}`;
   }catch(e){S.evalData=fallbackData();}
 
   // Save to Supabase
-  await supa.from('entrevistas').insert({
+  const{error:insertError}=await supa.from('entrevistas').insert({
     user_id:currentUser.id,
     puesto:S.puesto,sector:S.sector,nivel:S.nivel,
     candidato:S.nombre,
@@ -612,6 +613,8 @@ ENTREVISTA:\n${conv.substring(0,4000)}`;
     agilidad:S.evalData.agilidad||0,
     motivacion:S.evalData.motivacion||0
   });
+  if(insertError) console.error('ERROR GUARDANDO ENTREVISTA:', JSON.stringify(insertError));
+  else console.log('Entrevista guardada OK');
 
   hideLoader();showView('results');renderResults(S.evalData);
 }
