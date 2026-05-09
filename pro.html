@@ -889,7 +889,7 @@ function acceptCookies(){localStorage.setItem('entria-cookies','accepted');docum
 function rejectCookies(){localStorage.setItem('entria-cookies','rejected');document.getElementById('cookieBanner').style.display='none';}
 
 async function api(sys,msgs){
-  const r=await fetch('https://entria-proxy-new.jobwinspain.workers.dev/',{
+  const r=await fetch('https://entria-proxy.jobwinspain.workers.dev/',{
     method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,system:sys,messages:msgs})
   });
