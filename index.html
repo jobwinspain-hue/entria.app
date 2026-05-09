@@ -120,15 +120,15 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:20px 4
 /* PAYWALL */
 .paywall-overlay{position:fixed;inset:0;background:rgba(26,24,20,0.6);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px)}
 .paywall{background:var(--bg);border-radius:20px;padding:48px 40px;width:100%;max-width:460px;text-align:center;animation:fadeUp .3s ease}
-.paywall-icon{font-size:48px;margin-bottom:16px}
-.paywall h2{font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;margin-bottom:12px}
-.paywall p{color:var(--ink2);font-size:15px;line-height:1.7;margin-bottom:24px;max-width:340px;margin-left:auto;margin-right:auto}
-.paywall-price{font-family:'DM Serif Display',serif;font-size:52px;color:var(--accent);line-height:1}
-.paywall-price-sub{font-size:13px;color:var(--ink2);margin-bottom:28px;margin-top:4px}
-.paywall-features{text-align:left;background:white;border-radius:12px;padding:20px 24px;margin-bottom:28px;border:1px solid var(--border)}
-.paywall-features li{font-size:14px;color:var(--ink2);line-height:1.9;list-style:none}
+.paywall-icon{font-size:28px;margin-bottom:8px}
+.paywall h2{font-family:'DM Serif Display',serif;font-size:22px;font-weight:400;margin-bottom:8px}
+.paywall p{color:var(--ink2);font-size:13px;line-height:1.5;margin-bottom:12px;max-width:340px;margin-left:auto;margin-right:auto}
+.paywall-price{font-family:'DM Serif Display',serif;font-size:38px;color:var(--accent);line-height:1}
+.paywall-price-sub{font-size:12px;color:var(--ink2);margin-bottom:12px;margin-top:2px}
+.paywall-features{text-align:left;background:white;border-radius:10px;padding:12px 18px;margin-bottom:14px;border:1px solid var(--border)}
+.paywall-features li{font-size:13px;color:var(--ink2);line-height:1.6;list-style:none}
 .paywall-features li::before{content:'✓ ';color:var(--accent);font-weight:700}
-.paywall-btn{width:100%;background:var(--accent);color:white;border:none;padding:16px;border-radius:10px;font-family:'Instrument Sans',sans-serif;font-size:16px;font-weight:600;cursor:pointer;transition:all .15s;margin-bottom:12px}
+.paywall-btn{width:100%;background:var(--accent);color:white;border:none;padding:13px;border-radius:10px;font-family:'Instrument Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .15s;margin-bottom:8px}
 .paywall-btn:hover{background:#1f4f38;transform:translateY(-1px)}
 .paywall-back{background:none;border:none;color:var(--ink2);font-size:14px;cursor:pointer;font-family:'Instrument Sans',sans-serif}
 .paywall-back:hover{color:var(--ink)}
@@ -266,8 +266,8 @@ textarea{resize:vertical;min-height:140px;line-height:1.6}
   <div class="paywall" style="max-height:90vh;overflow-y:auto">
 
     <!-- Bloque dinámico con resultados parciales -->
-    <div id="paywallResults" style="display:none;background:#f5f2ec;border-radius:12px;padding:20px;margin-bottom:20px;text-align:left">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div id="paywallResults" style="display:none;background:#f5f2ec;border-radius:10px;padding:12px;margin-bottom:12px;text-align:left">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <div style="font-size:13px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:0.5px">Tu progreso hasta ahora</div>
         <div id="paywallScore" style="font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;color:#2d6a4f"></div>
       </div>
