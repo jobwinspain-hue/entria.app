@@ -274,7 +274,12 @@ textarea{resize:vertical;min-height:120px;line-height:1.6}
         </div>
         <button class="btn-nueva" onclick="showView('setup')">Nueva entrevista →</button>
       </div>
-      <div class="history-title">Últimas entrevistas</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div class="history-title">Últimas entrevistas</div>
+        <select id="filtroProceso" onchange="renderHistory()" style="font-family:'Instrument Sans',sans-serif;font-size:13px;border:1px solid var(--border);border-radius:8px;padding:6px 12px;background:white;color:var(--ink);cursor:pointer;display:none">
+          <option value="">Todos los procesos</option>
+        </select>
+      </div>
       <div id="historyList"><div class="history-empty">Aún no has realizado ninguna entrevista.<br>¡Empieza ahora y ve tu progreso aquí!</div></div>
     </div>
 
@@ -903,9 +908,12 @@ async function api(sys,msgs){
 }
 
 window.deleteInterview=async function(id){
-  if(!confirm('¿Eliminar esta entrevista?'))return;
-  const{error}=await supa.from('entrevistas').delete().eq('id',id).eq('user_id',currentUser.id);
-  if(!error){historyData=historyData.filter(e=>e.id!==id);renderStats();renderHistory();}
+  if(!confirm('¿Eliminar esta entrevista del historial?'))return;
+  const{error}=await supa.from('entrevistas').delete().eq('id',id);
+  if(error){console.error('Error eliminando:',error);alert('Error al eliminar. Inténtalo de nuevo.');return;}
+  historyData=historyData.filter(e=>e.id!==id);
+  renderStats();
+  renderHistory();
 };
 </script>
 
