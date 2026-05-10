@@ -515,6 +515,7 @@ async function startInterview(){
   S.nivel=document.getElementById('nivel').value;
   S.oferta=document.getElementById('oferta').value.trim();
   S.nombre=document.getElementById('nombre').value.trim()||currentUser.email.split('@')[0]||'Candidato';
+  S.proceso=document.getElementById('proceso').value.trim();
   loader('Preparando tu entrevista personalizada...');
   S.history=[{role:'user',content:`Hola, estoy aquí para la entrevista del puesto de ${S.puesto}. Me llamo ${S.nombre}.`}];
   try{
