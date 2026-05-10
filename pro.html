@@ -456,11 +456,29 @@ function renderStats(){
 
 function renderHistory(){
   const list=document.getElementById('historyList');
-  if(historyData.length===0){
-    list.innerHTML='<div class="history-empty">Aún no has realizado ninguna entrevista.<br>¡Empieza ahora y ve tu progreso aquí!</div>';
+
+  // Mostrar/actualizar filtro de proceso
+  const filtro=document.getElementById('filtroProceso');
+  if(filtro){
+    const procesos=[...new Set(historyData.map(e=>e.proceso).filter(Boolean))];
+    if(procesos.length>0){
+      const current=filtro.value;
+      filtro.style.display='block';
+      filtro.innerHTML='<option value="">Todos los procesos</option>'+
+        procesos.map(p=>`<option value="${p}"${p===current?' selected':''}>${p}</option>`).join('');
+    } else {
+      filtro.style.display='none';
+    }
+  }
+
+  const filtroVal=filtro?filtro.value:'';
+  const filtered=filtroVal?historyData.filter(e=>e.proceso===filtroVal):historyData;
+
+  if(filtered.length===0){
+    list.innerHTML='<div class="history-empty">'+(filtroVal?'No hay entrevistas en este proceso.':'Aún no has realizado ninguna entrevista.<br>¡Empieza ahora y ve tu progreso aquí!')+'</div>';
     return;
   }
-  list.innerHTML=historyData.slice(0,10).map(e=>{
+  list.innerHTML=filtered.slice(0,10).map(e=>{
     const col=e.puntuacion>=75?'#2d6a4f':e.puntuacion>=55?'#b7621b':'#c0392b';
     const bg=e.puntuacion>=75?'#d8f3dc':e.puntuacion>=55?'#fef3e2':'#fde8d8';
     const date=new Date(e.created_at).toLocaleDateString('es-ES');
