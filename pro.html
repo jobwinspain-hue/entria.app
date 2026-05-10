@@ -442,15 +442,19 @@ async function loadHistory(){
 }
 
 function renderStats(){
-  const total=historyData.length;
+  // Respetar filtro activo
+  const filtro=document.getElementById('filtroProceso');
+  const filtroVal=filtro?filtro.value:'';
+  const data=filtroVal?historyData.filter(e=>e.proceso===filtroVal):historyData;
+
+  const total=data.length;
   document.getElementById('statEntrevistas').textContent=total;
   if(total===0){document.getElementById('statMedia').textContent='—';document.getElementById('statMejor').textContent='—';return;}
-  const scores=historyData.map(e=>e.puntuacion).filter(Boolean);
+  const scores=data.map(e=>e.puntuacion).filter(Boolean);
   const media=Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
   const mejor=Math.max(...scores);
   document.getElementById('statMedia').textContent=media||'—';
   document.getElementById('statMejor').textContent=mejor||'—';
-  // Greeting by time
   document.querySelector('.dash-header h1').textContent='¡Hola! 👋';
 }
 
