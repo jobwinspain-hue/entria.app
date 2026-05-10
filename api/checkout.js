@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     const { email } = req.body;
 
     const stripeKey = process.env.STRIPE_SECRET_KEY;
-    const priceId = process.env.STRIPE_PRICE_ID || 'price_1TUZxP6f53qziEHWKiQY4i9v';
+    const priceId = 'price_1TUZxP6f53qziEHWKiQY4i9v';
 
     console.log('stripe key exists:', !!stripeKey);
     console.log('price id:', priceId);
