@@ -1,22 +1,24 @@
-export const config = { runtime: 'edge' };
-
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
-export default async function handler(request) {
-  if (request.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
   }
 
-  if (request.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405, headers: corsHeaders });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { email } = await request.json();
+    const { email } = req.body;
 
     const params = new URLSearchParams({
       'payment_method_types[]': 'card',
@@ -39,13 +41,15 @@ export default async function handler(request) {
     });
 
     const session = await response.json();
-    return new Response(JSON.stringify({ url: session.url }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    
+    if (session.url) {
+      return res.status(200).json({ url: session.url });
+    } else {
+      console.error('Stripe error:', JSON.stringify(session));
+      return res.status(500).json({ error: 'Stripe error', details: session });
+    }
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    console.error('Checkout error:', err.message);
+    return res.status(500).json({ error: err.message });
   }
 }
