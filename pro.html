@@ -501,6 +501,8 @@ function renderHistory(){
       <span class="history-nivel" style="background:${nivelCol};color:${nivelTxt}">${e.nivel_evaluacion||''}</span>
     </div>`;
   }).join('');
+  // Update stats based on current filter
+  renderStats();
 }
 
 function viewHistoryItem(id){
