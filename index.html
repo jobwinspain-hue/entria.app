@@ -610,6 +610,11 @@ ENTREVISTA PARCIAL:\n${conv.substring(0,2000)}`;
         (data.puntosFuertes||[]).map(p=>`<li>${p}</li>`).join('');
       document.getElementById('paywallMejora').innerHTML=
         (data.mejorar||[]).map(p=>`<li>${p}</li>`).join('');
+      // Guardar puntuacion en entrevistas_free
+      supa.from('entrevistas_free').update({puntuacion:data.puntuacion})
+        .eq('puesto',S.puesto).eq('sector',S.sector).eq('nivel',S.nivel)
+        .order('created_at',{ascending:false}).limit(1)
+        .then(()=>{}).catch(()=>{});
     } catch(e){
       document.getElementById('paywallResults').style.display='none';
     }
@@ -874,7 +879,7 @@ async function api(sys,msgs){
     <a href="/legal.html" onclick="localStorage.setItem('legalTab','cookies')" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color .15s" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">Cookies</a>
     <a href="mailto:info@entriajobs.com" style="font-size:13px;color:rgba(255,255,255,0.5);text-decoration:none;transition:color .15s" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">info@entriajobs.com</a>
   </div>
-  <p style="font-size:12px;opacity:0.3;margin-top:20px">© 2026 EntrIA · JAFM · Málaga, España</p>
+  <p style="font-size:12px;opacity:0.3;margin-top:20px">© 2026 EntrIA · José Antonio Fernández Montoya · Málaga, España</p>
 </footer>
 
 <!-- COOKIE BANNER -->
